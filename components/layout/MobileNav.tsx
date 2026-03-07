@@ -10,6 +10,7 @@ export interface MobileNavProps {
     image?: string | null;
     username?: string;
   } | null;
+  friendRequestCount?: number;
 }
 
 const NAV_ITEMS = [
@@ -20,7 +21,7 @@ const NAV_ITEMS = [
   { href: "/groups", label: "Grupper", icon: "👨‍👩‍👧‍👦" },
 ] as const;
 
-export function MobileNav({ user }: MobileNavProps) {
+export function MobileNav({ user, friendRequestCount = 0 }: MobileNavProps) {
   const pathname = usePathname();
 
   return (
@@ -30,6 +31,7 @@ export function MobileNav({ user }: MobileNavProps) {
           href === "/feed"
             ? pathname === "/feed"
             : pathname === href || pathname.startsWith(href + "/");
+        const showBadge = href === "/friends" && friendRequestCount > 0;
         return (
           <Link
             key={href}
@@ -37,7 +39,14 @@ export function MobileNav({ user }: MobileNavProps) {
             className={isActive ? styles.linkActive : styles.link}
             aria-current={isActive ? "page" : undefined}
           >
-            <span className={styles.icon}>{icon}</span>
+            <span className={styles.iconWrap}>
+              <span className={styles.icon}>{icon}</span>
+              {showBadge && (
+                <span className={styles.friendBadge} aria-label={`${friendRequestCount} väntande vänförfrågningar`}>
+                  {friendRequestCount > 99 ? "99+" : friendRequestCount}
+                </span>
+              )}
+            </span>
             <span className={styles.label}>{label}</span>
           </Link>
         );

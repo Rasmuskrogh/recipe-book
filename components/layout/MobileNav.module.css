@@ -43,9 +43,33 @@
     color: var(--accent);
   }
 
+  .iconWrap {
+    position: relative;
+    display: inline-block;
+  }
+
   .icon {
     font-size: 1.3rem;
     line-height: 1;
+  }
+
+  .friendBadge {
+    position: absolute;
+    top: -4px;
+    right: -8px;
+    min-width: 0.875rem;
+    height: 0.875rem;
+    padding: 0 0.2rem;
+    font-size: 0.55rem;
+    font-weight: 600;
+    line-height: 0.875rem;
+    color: #fff;
+    background: #c00;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: content-box;
   }
 
   .icon :global(.avatar) {

@@ -127,3 +127,9 @@ export async function getFriendshipStatus(
   if (receivedRequest) return { status: "pending_received", requestId: receivedRequest.id };
   return { status: "none" };
 }
+
+export async function getPendingFriendRequestCount(userId: string): Promise<number> {
+  return prisma.friendRequest.count({
+    where: { receiverId: userId, status: "PENDING" },
+  });
+}

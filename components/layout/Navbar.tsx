@@ -13,6 +13,7 @@ export interface NavbarProps {
     image?: string | null;
     username?: string;
   } | null;
+  friendRequestCount?: number;
 }
 
 const NAV_LINKS = [
@@ -23,7 +24,7 @@ const NAV_LINKS = [
   { href: "/groups", label: "Grupper" },
 ] as const;
 
-export function Navbar({ user }: NavbarProps) {
+export function Navbar({ user, friendRequestCount = 0 }: NavbarProps) {
   const pathname = usePathname();
 
   return (
@@ -37,13 +38,21 @@ export function Navbar({ user }: NavbarProps) {
             href === "/feed"
               ? pathname === "/feed"
               : pathname === href || pathname.startsWith(href + "/");
+          const showBadge = href === "/friends" && friendRequestCount > 0;
           return (
             <li key={href}>
               <Link
                 href={href}
                 className={isActive ? styles.navLinkActive : styles.navLink}
               >
-                {label}
+                <span className={styles.navLinkInner}>
+                  {label}
+                  {showBadge && (
+                    <span className={styles.friendBadge} aria-label={`${friendRequestCount} väntande vänförfrågningar`}>
+                      {friendRequestCount > 99 ? "99+" : friendRequestCount}
+                    </span>
+                  )}
+                </span>
               </Link>
             </li>
           );
