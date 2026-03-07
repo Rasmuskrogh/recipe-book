@@ -14,7 +14,9 @@ export function convertIngredient(ingredient: Ingredient, toSystem: UnitSystem):
   const targetUnit = getTargetUnitForSystem(fromUnit, toSystem);
   if (!targetUnit) return ingredient;
   try {
-    const value = convert(ingredient.amount).from(cuFrom).to(targetUnit);
+    const value = convert(ingredient.amount)
+      .from(cuFrom as convert.Unit)
+      .to(targetUnit as convert.Unit);
     const rounded = Math.round(value * 100) / 100;
     const displayUnit = UNIT_LABELS[targetUnit] ?? targetUnit;
     return {
