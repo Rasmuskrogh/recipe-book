@@ -1,0 +1,15 @@
+.cookMode {
+  padding: 1rem;
+  max-width: 40rem;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 1rem;
+}
+
+.wakeLockWrap {
+  margin-bottom: 1rem;
+}

@@ -1,0 +1,136 @@
+.page {
+  padding: 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.title {
+  margin: 0;
+  font-family: "Playfair Display", serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.newButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: var(--accent);
+  color: white;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.newButton:hover {
+  opacity: 0.88;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.search {
+  flex: 1;
+  min-width: 12rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.9375rem;
+  min-width: 0;
+}
+
+.clearBtn {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+
+.clearBtn:hover {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.search::placeholder {
+  opacity: 0.7;
+}
+
+.toggleLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9375rem;
+  user-select: none;
+}
+
+.toggle {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.toggleText {
+  white-space: nowrap;
+}
+
+.error {
+  color: var(--text);
+  margin: 0 0 1rem;
+}
+
+.loading,
+.empty {
+  margin: 0 0 1rem;
+  font-size: 0.9375rem;
+  color: var(--muted);
+}
+
+.emptyLink {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.emptyLink:hover {
+  opacity: 0.9;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}

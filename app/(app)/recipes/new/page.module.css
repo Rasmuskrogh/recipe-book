@@ -1,0 +1,207 @@
+.page {
+  padding: 1.5rem;
+  max-width: 40rem;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.error {
+  margin: 0;
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  color: #dc2626;
+  background: #fef2f2;
+  border-radius: 0.25rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.field label {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.field input,
+.field select,
+.field textarea {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--foreground);
+  border-radius: 0.25rem;
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 1rem;
+}
+
+.inputError {
+  border-color: #dc2626;
+}
+
+.fieldError {
+  font-size: 0.75rem;
+  color: #dc2626;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.row .field {
+  flex: 1;
+  min-width: 6rem;
+}
+
+.preview {
+  max-width: 12rem;
+  max-height: 12rem;
+  object-fit: cover;
+  border-radius: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.unitToggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.unitToggle button {
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--foreground);
+  border-radius: 0.25rem;
+  background: var(--background);
+  color: var(--foreground);
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.unitToggle button.active {
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.section h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.ingRow,
+.stepRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.ingRow input,
+.ingRow select {
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--foreground);
+  border-radius: 0.25rem;
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 0.875rem;
+}
+
+.ingRow input[placeholder="Namn"] {
+  min-width: 8rem;
+  flex: 1;
+}
+
+.ingRow input[type="number"] {
+  width: 5rem;
+}
+
+.ingRow select {
+  width: 5rem;
+}
+
+.ingRow input[placeholder="Not (valfritt)"] {
+  min-width: 6rem;
+  flex: 1;
+}
+
+.stepRow {
+  align-items: flex-start;
+}
+
+.stepNum {
+  font-weight: 600;
+  min-width: 2rem;
+}
+
+.stepRow textarea {
+  flex: 1;
+  min-width: 12rem;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--foreground);
+  border-radius: 0.25rem;
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 0.875rem;
+}
+
+.stepDuration {
+  width: 4rem;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--foreground);
+  border-radius: 0.25rem;
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 0.875rem;
+}
+
+.removeBtn {
+  padding: 0.35rem 0.5rem;
+  font-size: 0.75rem;
+  border: 1px solid var(--foreground);
+  border-radius: 0.25rem;
+  background: transparent;
+  color: var(--foreground);
+  cursor: pointer;
+}
+
+.removeBtn:hover {
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.submit {
+  margin-top: 0.5rem;
+  padding: 0.625rem 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--background);
+  background: var(--foreground);
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

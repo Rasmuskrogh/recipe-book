@@ -1,0 +1,43 @@
+.layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+.navbarWrap {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .navbarWrap {
+    display: none;
+  }
+}
+
+.main {
+  flex: 1;
+  padding: calc(var(--nav-h) + 2.5rem) 2rem 4rem;
+}
+
+@media (max-width: 640px) {
+  .main {
+    padding-bottom: 5rem;
+  }
+}
+
+.mobileNavWrap {
+  flex-shrink: 0;
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobileNavWrap {
+    display: block;
+  }
+}

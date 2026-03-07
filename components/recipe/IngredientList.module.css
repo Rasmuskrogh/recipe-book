@@ -1,0 +1,38 @@
+.ingredientList {
+  margin-top: 1.5rem;
+}
+
+.title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid var(--foreground);
+  border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+.amount {
+  font-weight: 500;
+  min-width: 6rem;
+}
+
+.name {
+  flex: 1;
+}
+
+.notes {
+  font-size: 0.875rem;
+  opacity: 0.85;
+}

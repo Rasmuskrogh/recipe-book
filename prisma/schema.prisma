@@ -1,0 +1,187 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  username      String    @unique
+  email         String    @unique
+  password      String?
+  emailVerified DateTime?
+  image         String?
+  bio           String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  recipes       Recipe[]
+
+  sentRequests     FriendRequest[] @relation("SentRequests")
+  receivedRequests FriendRequest[] @relation("ReceivedRequests")
+  friendsOf        Friendship[]    @relation("FriendA")
+  friends          Friendship[]    @relation("FriendB")
+
+  groupMemberships         GroupMember[]
+  messages                 Message[]
+  conversationParticipants ConversationParticipant[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Recipe {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  imageUrl    String?
+  category    String?
+  servings    Int      @default(4)
+  prepTime    Int?
+  cookTime    Int?
+  totalTime   Int?
+  difficulty  String?
+  isPublic    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  ingredients Ingredient[]
+  steps       RecipeStep[]
+  tags        RecipeTag[]
+}
+
+model Ingredient {
+  id       String  @id @default(cuid())
+  name     String
+  amount   Float
+  unit     String
+  notes    String?
+  order    Int     @default(0)
+  recipeId String
+  recipe   Recipe  @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+}
+
+model RecipeStep {
+  id          String  @id @default(cuid())
+  order       Int
+  instruction String  @db.Text
+  duration    Int?
+  recipeId    String
+  recipe      Recipe  @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+}
+
+model RecipeTag {
+  id       String @id @default(cuid())
+  name     String
+  recipeId String
+  recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+}
+
+model FriendRequest {
+  id         String   @id @default(cuid())
+  senderId   String
+  receiverId String
+  status     String   @default("PENDING")
+  createdAt  DateTime @default(now())
+  sender     User     @relation("SentRequests", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver   User     @relation("ReceivedRequests", fields: [receiverId], references: [id], onDelete: Cascade)
+  @@unique([senderId, receiverId])
+}
+
+model Friendship {
+  id        String   @id @default(cuid())
+  userAId   String
+  userBId   String
+  createdAt DateTime @default(now())
+  userA     User     @relation("FriendA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB     User     @relation("FriendB", fields: [userBId], references: [id], onDelete: Cascade)
+  @@unique([userAId, userBId])
+}
+
+model Group {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  members     GroupMember[]
+  messages    GroupMessage[]
+}
+
+model GroupMember {
+  id       String   @id @default(cuid())
+  role     String   @default("MEMBER")
+  joinedAt DateTime @default(now())
+  groupId  String
+  userId   String
+  group    Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([groupId, userId])
+}
+
+model GroupMessage {
+  id        String   @id @default(cuid())
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  groupId   String
+  senderId  String
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+}
+
+model Conversation {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  participants ConversationParticipant[]
+  messages     Message[]
+}
+
+model ConversationParticipant {
+  id             String       @id @default(cuid())
+  conversationId String
+  userId         String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([conversationId, userId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  content        String       @db.Text
+  createdAt      DateTime     @default(now())
+  conversationId String
+  senderId       String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+}

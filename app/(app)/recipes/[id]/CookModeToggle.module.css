@@ -1,0 +1,11 @@
+.wrap {
+  margin-top: 1rem;
+}
+
+.status {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+  opacity: 0.9;
+}

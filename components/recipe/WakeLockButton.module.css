@@ -1,0 +1,19 @@
+.wakeLockButton {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  border: 1px solid var(--foreground);
+  border-radius: 0.25rem;
+  background: var(--background);
+  color: var(--foreground);
+  cursor: pointer;
+}
+
+.wakeLockButton:hover {
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.wakeLockButton.active {
+  background: var(--foreground);
+  color: var(--background);
+}

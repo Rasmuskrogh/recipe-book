@@ -1,0 +1,34 @@
+.page {
+  padding: 1.5rem;
+  max-width: 56rem;
+  margin: 0 auto;
+}
+
+.actions {
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.editButton {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--background);
+  background: var(--foreground);
+  border-radius: 0.25rem;
+}
+
+.editButton:hover {
+  opacity: 0.9;
+}
+
+.recipesSection {
+  margin-top: 2rem;
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}

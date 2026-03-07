@@ -1,0 +1,282 @@
+"use client";
+
+import { useState, useCallback, useRef } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Avatar } from "@/components/ui/Avatar";
+import type { FriendEntry, IncomingRequestEntry } from "@/lib/friends";
+import styles from "./FriendsContent.module.css";
+
+type SearchUser = {
+  id: string;
+  name: string | null;
+  username: string;
+  image: string | null;
+  recipeCount: number;
+};
+
+type Tab = "friends" | "requests";
+
+interface FriendsContentProps {
+  initialFriends: FriendEntry[];
+  initialRequests: IncomingRequestEntry[];
+}
+
+export function FriendsContent({
+  initialFriends,
+  initialRequests,
+}: FriendsContentProps) {
+  const router = useRouter();
+  const [tab, setTab] = useState<Tab>("friends");
+  const [friends, setFriends] = useState(initialFriends);
+  const [requests, setRequests] = useState(initialRequests);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchUser[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [sendingId, setSendingId] = useState<string | null>(null);
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const runSearch = useCallback(async (q: string) => {
+    if (!q.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    setSearching(true);
+    try {
+      const res = await fetch(
+        "/api/users?search=" + encodeURIComponent(q.trim())
+      );
+      const data = await res.json();
+      setSearchResults(data.users ?? []);
+    } catch {
+      setSearchResults([]);
+    } finally {
+      setSearching(false);
+    }
+  }, []);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    if (value.trim().length >= 1) {
+      searchTimeoutRef.current = setTimeout(() => runSearch(value), 300);
+    } else {
+      setSearchResults([]);
+    }
+  };
+
+  const sendRequest = async (receiverId: string) => {
+    setSendingId(receiverId);
+    try {
+      const res = await fetch("/api/friends", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ receiverId }),
+      });
+      if (res.ok) {
+        setSearchResults((prev) => prev.filter((u) => u.id !== receiverId));
+        router.refresh();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error ?? "Kunde inte skicka förfrågan");
+      }
+    } finally {
+      setSendingId(null);
+    }
+  };
+
+  const handleAccept = async (requestId: string) => {
+    const req = requests.find((r) => r.id === requestId);
+    const res = await fetch("/api/friends", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ requestId, action: "accept" }),
+    });
+    if (res.ok && req) {
+      setRequests((prev) => prev.filter((r) => r.id !== requestId));
+      setFriends((prev) => [...prev, req.sender]);
+      router.refresh();
+    }
+  };
+
+  const handleReject = async (requestId: string) => {
+    const res = await fetch("/api/friends", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ requestId, action: "reject" }),
+    });
+    if (res.ok) {
+      setRequests((prev) => prev.filter((r) => r.id !== requestId));
+      router.refresh();
+    }
+  };
+
+  return (
+    <div className={styles.page}>
+      <h1 className={styles.title}>Vänner</h1>
+
+      <div className={styles.searchWrap}>
+        <label htmlFor="user-search" className={styles.searchLabel}>
+          Sök användare
+        </label>
+        <input
+          id="user-search"
+          type="search"
+          placeholder="Sök på namn eller användarnamn..."
+          value={searchQuery}
+          onChange={handleSearchChange}
+          className={styles.searchInput}
+        />
+        {searching && <span className={styles.searching}>Söker…</span>}
+        {searchResults.length > 0 && (
+          <ul className={styles.searchResults}>
+            {searchResults.map((u) => (
+              <li key={u.id} className={styles.searchRow}>
+                <Link
+                  href={"/profile/" + encodeURIComponent(u.username)}
+                  className={styles.searchRowLink}
+                >
+                  <Avatar
+                    src={u.image}
+                    alt={u.name ?? u.username}
+                    size="sm"
+                    className={styles.searchAvatar}
+                  />
+                  <span className={styles.searchName}>
+                    {u.name || u.username}
+                  </span>
+                  <span className={styles.searchUsername}>@{u.username}</span>
+                  <span className={styles.searchRecipes}>
+                    {u.recipeCount} recept
+                  </span>
+                </Link>
+                <button
+                  type="button"
+                  className={styles.addBtn}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    sendRequest(u.id);
+                  }}
+                  disabled={sendingId === u.id}
+                >
+                  {sendingId === u.id ? "Skickar…" : "Lägg till vän"}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div className={styles.tabs}>
+        <button
+          type="button"
+          className={tab === "friends" ? styles.tabActive : styles.tab}
+          onClick={() => setTab("friends")}
+        >
+          Mina vänner
+        </button>
+        <button
+          type="button"
+          className={tab === "requests" ? styles.tabActive : styles.tab}
+          onClick={() => setTab("requests")}
+        >
+          Förfrågningar
+          {requests.length > 0 && (
+            <span className={styles.badge}>{requests.length}</span>
+          )}
+        </button>
+      </div>
+
+      {tab === "friends" && (
+        <section className={styles.section}>
+          {friends.length === 0 ? (
+            <p className={styles.empty}>Du har inga vänner än.</p>
+          ) : (
+            <ul className={styles.list}>
+              {friends.map((f) => (
+                <li key={f.id}>
+                  <Link
+                    href={"/profile/" + encodeURIComponent(f.username)}
+                    className={styles.friendRow}
+                  >
+                    <Avatar
+                      src={f.image}
+                      alt={f.name ?? f.username}
+                      size="md"
+                      className={styles.avatar}
+                    />
+                    <div className={styles.friendInfo}>
+                      <span className={styles.friendName}>
+                        {f.name || f.username}
+                      </span>
+                      <span className={styles.friendUsername}>
+                        @{f.username}
+                      </span>
+                    </div>
+                    <span className={styles.recipeCount}>
+                      {f.recipeCount} recept
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
+
+      {tab === "requests" && (
+        <section className={styles.section}>
+          {requests.length === 0 ? (
+            <p className={styles.empty}>Inga väntande förfrågningar.</p>
+          ) : (
+            <ul className={styles.list}>
+              {requests.map((r) => (
+                <li key={r.id} className={styles.requestRow}>
+                  <Link
+                    href={"/profile/" + encodeURIComponent(r.sender.username)}
+                    className={styles.requestLink}
+                  >
+                    <Avatar
+                      src={r.sender.image}
+                      alt={r.sender.name ?? r.sender.username}
+                      size="md"
+                      className={styles.avatar}
+                    />
+                    <div className={styles.friendInfo}>
+                      <span className={styles.friendName}>
+                        {r.sender.name || r.sender.username}
+                      </span>
+                      <span className={styles.friendUsername}>
+                        @{r.sender.username}
+                      </span>
+                      <span className={styles.recipeCount}>
+                        {r.sender.recipeCount} recept
+                      </span>
+                    </div>
+                  </Link>
+                  <div className={styles.requestActions}>
+                    <button
+                      type="button"
+                      className={styles.acceptBtn}
+                      onClick={() => handleAccept(r.id)}
+                    >
+                      Acceptera
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.rejectBtn}
+                      onClick={() => handleReject(r.id)}
+                    >
+                      Avvisa
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
+    </div>
+  );
+}

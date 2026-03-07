@@ -1,0 +1,66 @@
+.button,
+.buttonPrimary,
+.buttonSecondary,
+.buttonDanger {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: opacity 0.15s;
+}
+
+.button:disabled,
+.buttonPrimary:disabled,
+.buttonSecondary:disabled,
+.buttonDanger:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.button {
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.button:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.buttonPrimary {
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.buttonSecondary {
+  background: transparent;
+  color: var(--foreground);
+  border-color: var(--foreground);
+}
+
+.buttonDanger {
+  background: transparent;
+  color: var(--error, #c00);
+  border-color: var(--error, #c00);
+}
+
+.buttonDanger:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.buttonDisabled {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--muted);
+  background: var(--muted-bg, rgba(128, 128, 128, 0.15));
+  cursor: default;
+}
+
+.receivedActions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}

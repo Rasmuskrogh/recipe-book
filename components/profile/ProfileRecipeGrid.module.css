@@ -1,0 +1,50 @@
+.profileRecipeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--foreground);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: var(--background);
+}
+
+.card:hover {
+  opacity: 0.9;
+}
+
+.imageWrap {
+  aspect-ratio: 1;
+  background: var(--foreground);
+  opacity: 0.1;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.placeholder {
+  width: 100%;
+  height: 100%;
+}
+
+.title {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty {
+  font-size: 0.9375rem;
+  color: var(--foreground);
+  opacity: 0.8;
+}

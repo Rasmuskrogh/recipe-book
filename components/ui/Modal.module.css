@@ -1,0 +1,15 @@
+.modal {
+  display: block;
+}
+
+.backdrop {
+  display: block;
+}
+
+.content {
+  display: block;
+}
+
+.title {
+  display: block;
+}
