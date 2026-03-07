@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -16,7 +17,7 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/feed";
@@ -96,5 +97,42 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+function LoginFallback() {
+  return (
+    <div className={styles.page}>
+      <div className={styles.card}>
+        <h1 className={styles.title}>Logga in</h1>
+        <div className={styles.form} aria-hidden>
+          <div className={styles.field}>
+            <label>E-post</label>
+            <div style={{ height: 40, background: "var(--color-border, #e5e5e5)", borderRadius: 4 }} />
+          </div>
+          <div className={styles.field}>
+            <label>Lösenord</label>
+            <div style={{ height: 40, background: "var(--color-border, #e5e5e5)", borderRadius: 4 }} />
+          </div>
+          <button type="button" className={styles.submit} disabled>
+            Laddar...
+          </button>
+        </div>
+        <p className={styles.footer}>
+          Har du inget konto?{" "}
+          <Link href="/register" className={styles.link}>
+            Registrera dig
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoginFallback />}>
+      <LoginForm />
+    </Suspense>
   );
 }
