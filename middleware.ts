@@ -1,24 +1,24 @@
-import { auth } from "@/lib/auth/auth";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
 
-export default auth((req) => {
-  const isLoggedIn = !!req.auth;
+const PROTECTED_PREFIXES = ["/feed", "/recipes", "/profile", "/friends", "/messages", "/groups"];
+
+export async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
-  const isProtected =
-    path.startsWith("/feed") ||
-    path.startsWith("/recipes") ||
-    path.startsWith("/profile") ||
-    path.startsWith("/friends") ||
-    path.startsWith("/messages") ||
-    path.startsWith("/groups");
+  const isProtected = PROTECTED_PREFIXES.some((p) => path.startsWith(p));
+  if (!isProtected) return NextResponse.next();
 
-  if (isProtected && !isLoggedIn) {
-    const loginUrl = new URL("/login", req.nextUrl.origin);
-    loginUrl.searchParams.set("callbackUrl", req.nextUrl.pathname);
-    return Response.redirect(loginUrl);
-  }
+  const token = await getToken({
+    req,
+    secret: process.env.AUTH_SECRET,
+  });
+  if (token) return NextResponse.next();
 
-  return undefined;
-});
+  const loginUrl = new URL("/login", req.nextUrl.origin);
+  loginUrl.searchParams.set("callbackUrl", req.nextUrl.pathname);
+  return NextResponse.redirect(loginUrl);
+}
 
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
