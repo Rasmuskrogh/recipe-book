@@ -131,13 +131,14 @@ model Friendship {
 }
 
 model Group {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  imageUrl    String?
-  createdAt   DateTime @default(now())
-  members     GroupMember[]
-  messages    GroupMessage[]
+  id            String        @id @default(cuid())
+  name          String
+  description   String?
+  imageUrl      String?
+  createdAt     DateTime      @default(now())
+  members       GroupMember[]
+  messages      GroupMessage[]
+  conversation  Conversation?
 }
 
 model GroupMember {
@@ -162,7 +163,10 @@ model GroupMessage {
 
 model Conversation {
   id           String   @id @default(cuid())
+  name         String?
   createdAt    DateTime @default(now())
+  groupId      String?  @unique
+  group        Group?   @relation(fields: [groupId], references: [id], onDelete: Cascade)
   participants ConversationParticipant[]
   messages     Message[]
 }
@@ -171,6 +175,7 @@ model ConversationParticipant {
   id             String       @id @default(cuid())
   conversationId String
   userId         String
+  lastReadAt     DateTime?
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   @@unique([conversationId, userId])

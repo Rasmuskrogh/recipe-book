@@ -34,20 +34,27 @@ export default function FeedPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setLoading(true);
-    setError(null);
+    let cancelled = false;
     fetch("/api/recipes?page=1&limit=12")
       .then((res) => {
         if (!res.ok) throw new Error("Kunde inte hämta recept");
         return res.json();
       })
       .then((data: { recipes: RecipeItem[]; hasMore: boolean }) => {
+        if (cancelled) return;
         setRecipes(data.recipes ?? []);
         setHasMore(data.hasMore ?? false);
         setPage(1);
       })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        if (!cancelled) setError(err.message);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   function loadMore() {

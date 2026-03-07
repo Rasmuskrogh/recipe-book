@@ -11,6 +11,6 @@ export interface GroupFormProps {
   isSubmitting?: boolean
 }
 
-export function GroupForm(p: GroupFormProps) {
+export function GroupForm(_: GroupFormProps) {
   return <div className={styles.groupForm}>GroupForm</div>
 }

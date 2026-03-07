@@ -1,8 +1,9 @@
 "use client";
 
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { UploadButton } from "@/lib/uploadthing-react";
@@ -61,7 +62,6 @@ export default function NewRecipePage() {
     handleSubmit,
     formState: { errors, isSubmitting },
     setValue,
-    watch,
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -84,7 +84,7 @@ export default function NewRecipePage() {
     name: "steps",
   });
 
-  const imageUrl = watch("imageUrl");
+  const imageUrl = useWatch({ control, name: "imageUrl", defaultValue: "" });
 
   async function onSubmit(data: FormData) {
     setError(null);
@@ -164,7 +164,16 @@ export default function NewRecipePage() {
 
         <div className={styles.field}>
           <label>Bild</label>
-          {imageUrl && <img src={imageUrl} alt="" className={styles.preview} />}
+          {imageUrl && (
+            <Image
+              src={imageUrl}
+              alt=""
+              width={200}
+              height={200}
+              className={styles.preview}
+              unoptimized={imageUrl.startsWith("data:")}
+            />
+          )}
           <UploadButton
             endpoint="imageUploader"
             onClientUploadComplete={(res) => {

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import styles from "./Avatar.module.css";
 
 export interface AvatarProps {
@@ -9,6 +10,8 @@ export interface AvatarProps {
   className?: string;
 }
 
+const SIZE_PX = { sm: 32, md: 40, lg: 80 } as const;
+
 export function Avatar({ src, alt, initials, size = "md", className }: AvatarProps) {
   const sizeClass =
     size === "sm" ? styles.sm : size === "lg" ? styles.lg : styles.md;
@@ -16,12 +19,20 @@ export function Avatar({ src, alt, initials, size = "md", className }: AvatarPro
     (initials && initials.length >= 1)
       ? initials.slice(0, 2).toUpperCase()
       : alt.slice(0, 1).toUpperCase();
+  const px = SIZE_PX[size];
   return (
     <div
       className={`${styles.avatar} ${sizeClass} ${className ?? ""}`.trim()}
     >
       {src ? (
-        <img src={src} alt={alt} className={styles.img} />
+        <Image
+          src={src}
+          alt={alt}
+          width={px}
+          height={px}
+          className={styles.img}
+          unoptimized={src.startsWith("data:")}
+        />
       ) : (
         <span className={styles.fallback} aria-hidden>
           {fallbackText}

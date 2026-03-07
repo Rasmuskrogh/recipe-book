@@ -13,6 +13,6 @@ export interface ConversationListProps {
   isLoading?: boolean
 }
 
-export function ConversationList(props: ConversationListProps) {
+export function ConversationList(_: ConversationListProps) {
   return <div className={styles.conversationList}>ConversationList</div>
 }

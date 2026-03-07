@@ -15,7 +15,7 @@ export interface IngredientListProps {
 
 export function IngredientList({
   ingredients,
-  servings,
+  servings: _,
   system = "metric",
 }: IngredientListProps) {
   const converted = useMemo(() => {

@@ -15,6 +15,6 @@ export interface GroupChatProps {
   isLoading?: boolean
 }
 
-export function GroupChat(p: GroupChatProps) {
+export function GroupChat(_: GroupChatProps) {
   return <div className={styles.groupChat}>GroupChat</div>
 }

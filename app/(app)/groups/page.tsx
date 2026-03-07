@@ -1,9 +1,11 @@
-import styles from './page.module.css'
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth/auth";
+import { GroupsList } from "./GroupsList";
 
-export default function GroupsPage() {
-  return (
-    <div className={styles.page}>
-      <h1>Grupper</h1>
-    </div>
-  )
+export default async function GroupsPage() {
+  const session = await auth();
+  if (!session?.user?.id) {
+    redirect("/login");
+  }
+  return <GroupsList />;
 }

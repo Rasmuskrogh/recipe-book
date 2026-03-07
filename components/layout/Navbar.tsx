@@ -14,6 +14,8 @@ export interface NavbarProps {
     username?: string;
   } | null;
   friendRequestCount?: number;
+  unreadMessageCount?: number;
+  unreadGroupCount?: number;
 }
 
 const NAV_LINKS = [
@@ -24,7 +26,12 @@ const NAV_LINKS = [
   { href: "/groups", label: "Grupper" },
 ] as const;
 
-export function Navbar({ user, friendRequestCount = 0 }: NavbarProps) {
+export function Navbar({
+  user,
+  friendRequestCount = 0,
+  unreadMessageCount = 0,
+  unreadGroupCount = 0,
+}: NavbarProps) {
   const pathname = usePathname();
 
   return (
@@ -38,7 +45,24 @@ export function Navbar({ user, friendRequestCount = 0 }: NavbarProps) {
             href === "/feed"
               ? pathname === "/feed"
               : pathname === href || pathname.startsWith(href + "/");
-          const showBadge = href === "/friends" && friendRequestCount > 0;
+          const showFriendBadge = href === "/friends" && friendRequestCount > 0;
+          const showMessageBadge =
+            href === "/messages" && unreadMessageCount > 0;
+          const showGroupBadge = href === "/groups" && unreadGroupCount > 0;
+          const badgeCount =
+            href === "/friends"
+              ? friendRequestCount
+              : href === "/messages"
+                ? unreadMessageCount
+                : href === "/groups"
+                  ? unreadGroupCount
+                  : 0;
+          const badgeLabel =
+            href === "/friends"
+              ? `${friendRequestCount} väntande vänförfrågningar`
+              : href === "/messages"
+                ? `${unreadMessageCount} olästa meddelanden`
+                : `${unreadGroupCount} olästa meddelanden i grupper`;
           return (
             <li key={href}>
               <Link
@@ -47,9 +71,12 @@ export function Navbar({ user, friendRequestCount = 0 }: NavbarProps) {
               >
                 <span className={styles.navLinkInner}>
                   {label}
-                  {showBadge && (
-                    <span className={styles.friendBadge} aria-label={`${friendRequestCount} väntande vänförfrågningar`}>
-                      {friendRequestCount > 99 ? "99+" : friendRequestCount}
+                  {(showFriendBadge || showMessageBadge || showGroupBadge) && (
+                    <span
+                      className={styles.friendBadge}
+                      aria-label={badgeLabel}
+                    >
+                      {badgeCount > 99 ? "99+" : badgeCount}
                     </span>
                   )}
                 </span>

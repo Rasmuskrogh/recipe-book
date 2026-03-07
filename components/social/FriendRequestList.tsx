@@ -13,6 +13,6 @@ export interface FriendRequestListProps {
   isLoading?: boolean
 }
 
-export function FriendRequestList(props: FriendRequestListProps) {
+export function FriendRequestList(_: FriendRequestListProps) {
   return <div className={styles.friendRequestList}>FriendRequestList</div>
 }

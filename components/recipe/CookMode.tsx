@@ -10,9 +10,9 @@ export interface CookModeProps {
 
 export function CookMode({
   title,
-  ingredients,
-  steps,
-  servings,
+  ingredients: _,
+  steps: __,
+  servings: ___,
 }: CookModeProps) {
   return (
     <div className={styles.cookMode}>

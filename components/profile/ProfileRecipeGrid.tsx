@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import styles from "./ProfileRecipeGrid.module.css";
 
 export interface RecipeItem {
@@ -12,7 +13,7 @@ export interface ProfileRecipeGridProps {
   username: string;
 }
 
-export function ProfileRecipeGrid({ recipes, username }: ProfileRecipeGridProps) {
+export function ProfileRecipeGrid({ recipes }: ProfileRecipeGridProps) {
   if (recipes.length === 0) {
     return <p className={styles.empty}>Inga publika recept än.</p>;
   }
@@ -26,7 +27,13 @@ export function ProfileRecipeGrid({ recipes, username }: ProfileRecipeGridProps)
         >
           <div className={styles.imageWrap}>
             {recipe.imageUrl ? (
-              <img src={recipe.imageUrl} alt="" className={styles.image} />
+              <Image
+                src={recipe.imageUrl}
+                alt=""
+                fill
+                className={styles.image}
+                sizes="(max-width: 640px) 50vw, 10rem"
+              />
             ) : (
               <div className={styles.placeholder} />
             )}

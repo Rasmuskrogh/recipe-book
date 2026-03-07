@@ -65,8 +65,11 @@ export default function RecipesPage() {
   const hasActiveFilters = search.trim() !== "" || category !== "" || difficulty !== "" || timeFilter !== "";
 
   useEffect(() => {
-    setLoading(true);
-    setError(null);
+    queueMicrotask(() => {
+      setLoading(true);
+      setError(null);
+    });
+    let cancelled = false;
     const params = new URLSearchParams();
     if (mine) params.set("mine", "true");
     if (search.trim()) params.set("search", search.trim());
@@ -81,9 +84,18 @@ export default function RecipesPage() {
         if (!res.ok) throw new Error("Kunde inte hämta recept");
         return res.json();
       })
-      .then((data: { recipes: RecipeItem[] }) => setRecipes(data.recipes ?? []))
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+      .then((data: { recipes: RecipeItem[] }) => {
+        if (!cancelled) setRecipes(data.recipes ?? []);
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err.message);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [mine, search, category, difficulty, timeFilter]);
 
   function clearFilters() {

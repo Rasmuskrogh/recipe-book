@@ -19,19 +19,21 @@
 
 .imageWrap {
   aspect-ratio: 1;
-  background: var(--foreground);
-  opacity: 0.1;
+  position: relative;
+  overflow: hidden;
 }
 
 .image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
 .placeholder {
   width: 100%;
   height: 100%;
+  background: var(--muted-bg, rgba(0, 0, 0, 0.08));
 }
 
 .title {

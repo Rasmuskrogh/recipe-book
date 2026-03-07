@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Avatar } from "@/components/ui/Avatar";
 import { getInitials } from "@/lib/utils/format";
 import styles from "./RecipeCard.module.css";
@@ -58,7 +59,13 @@ export function RecipeCard({
     <Link href={`/recipes/${id}`} className={styles.card}>
       <div className={styles.imageWrap}>
         {imageUrl ? (
-          <img src={imageUrl} alt="" className={styles.image} />
+          <Image
+            src={imageUrl}
+            alt=""
+            fill
+            className={styles.image}
+            sizes="(max-width: 640px) 100vw, 400px"
+          />
         ) : (
           <div className={styles.placeholder} aria-hidden />
         )}

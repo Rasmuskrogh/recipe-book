@@ -1,3 +1,48 @@
-.messageInput {
-  display: block;
+.wrapper {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-top: 1px solid var(--border, #e5e7eb);
+  background: var(--surface, #fff);
+  align-items: flex-end;
+}
+
+.input {
+  flex: 1;
+  min-height: 2.5rem;
+  max-height: 8rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 1.25rem;
+  resize: none;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.sendBtn {
+  flex-shrink: 0;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: var(--foreground);
+  color: var(--background);
+  border: none;
+  border-radius: 1.25rem;
+  cursor: pointer;
+}
+
+.sendBtn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.sendBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

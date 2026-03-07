@@ -4,6 +4,6 @@ export interface SidebarProps {
   user?: { username: string } | null
 }
 
-export function Sidebar(p: SidebarProps) {
+export function Sidebar(_: SidebarProps) {
   return <aside className={styles.sidebar}>Sidebar</aside>
 }

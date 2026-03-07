@@ -13,6 +13,6 @@ export interface FriendsListProps {
   isLoading?: boolean
 }
 
-export function FriendsList(p: FriendsListProps) {
+export function FriendsList(_: FriendsListProps) {
   return <div className={styles.friendsList}>FriendsList</div>
 }

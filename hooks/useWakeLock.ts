@@ -6,7 +6,9 @@ export function useWakeLock() {
   const [isSupported, setIsSupported] = useState(false);
 
   useEffect(() => {
-    setIsSupported("wakeLock" in navigator);
+    queueMicrotask(() => {
+      setIsSupported("wakeLock" in navigator);
+    });
   }, []);
 
   const request = useCallback(async () => {

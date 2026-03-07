@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
@@ -36,13 +36,13 @@ export function EditProfileForm({
     handleSubmit,
     formState: { errors, isSubmitting },
     setValue,
-    watch,
+    control,
   } = useForm<EditProfileFormData>({
     resolver: zodResolver(editProfileSchema),
     defaultValues,
   });
 
-  const imageUrl = watch("image");
+  const imageUrl = useWatch({ control, name: "image", defaultValue: defaultValues.image });
 
   async function onSubmit(data: EditProfileFormData) {
     setError(null);

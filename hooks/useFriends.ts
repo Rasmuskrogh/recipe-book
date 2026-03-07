@@ -1,9 +1,9 @@
 import { useState, useCallback } from "react";
 
 export function useFriends() {
-  const [friends, setFriends] = useState<unknown[]>([]);
-  const [requests, setRequests] = useState<unknown[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [friends, _setFriends] = useState<unknown[]>([]);
+  const [requests, _setRequests] = useState<unknown[]>([]);
+  const [isLoading, _setIsLoading] = useState(false);
 
   const sendRequest = useCallback(async (_userId: string) => {
     // Placeholder

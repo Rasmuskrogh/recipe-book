@@ -5,6 +5,6 @@ export interface SpinnerProps {
   className?: string
 }
 
-export function Spinner({ size = 'md', className }: SpinnerProps) {
+export function Spinner({ size = 'md', className: _ }: SpinnerProps) {
   return <div className={styles.spinner} data-size={size} />
 }

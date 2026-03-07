@@ -8,6 +8,6 @@ export interface ChatWindowProps {
   isLoading?: boolean
 }
 
-export function ChatWindow(p: ChatWindowProps) {
+export function ChatWindow(_: ChatWindowProps) {
   return <div className={styles.chatWindow}>ChatWindow</div>
 }

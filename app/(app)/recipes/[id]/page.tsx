@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { prisma } from "@/lib/db/prisma";
 import { Avatar } from "@/components/ui/Avatar";
 import { RecipeView } from "./RecipeView";
@@ -40,11 +41,16 @@ export default async function RecipePage({
     <div className={styles.page}>
       <article className={styles.article}>
         {recipe.imageUrl && (
-          <img
-            src={recipe.imageUrl}
-            alt=""
-            className={styles.hero}
-          />
+          <div className={styles.heroWrap}>
+            <Image
+              src={recipe.imageUrl}
+              alt=""
+              fill
+              className={styles.hero}
+              sizes="(max-width: 640px) 100vw, 40rem"
+              priority
+            />
+          </div>
         )}
         <h1 className={styles.title}>{recipe.title}</h1>
         {recipe.description && (

@@ -1,4 +1,4 @@
-﻿import styles from './Button.module.css'
+import styles from './Button.module.css'
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost'
@@ -6,6 +6,6 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   isLoading?: boolean
 }
 
-export function Button(p: ButtonProps) {
+export function Button(_: ButtonProps) {
   return <button className={styles.button}>Button</button>
 }

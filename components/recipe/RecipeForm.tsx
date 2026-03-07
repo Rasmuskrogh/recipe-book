@@ -7,6 +7,6 @@ export interface RecipeFormProps {
   isSubmitting?: boolean
 }
 
-export function RecipeForm(props: RecipeFormProps) {
+export function RecipeForm(_: RecipeFormProps) {
   return <div className={styles.recipeForm}>RecipeForm</div>
 }

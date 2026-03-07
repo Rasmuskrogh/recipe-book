@@ -19,7 +19,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") ?? "/profile";
+  const callbackUrl = searchParams.get("callbackUrl") ?? "/feed";
   const [error, setError] = useState<string | null>(null);
 
   const {

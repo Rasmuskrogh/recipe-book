@@ -70,7 +70,7 @@ export default function RegisterPage() {
       );
       return;
     }
-    router.push("/login?callbackUrl=/profile");
+    router.push("/login?callbackUrl=/feed");
     router.refresh();
   }
 
