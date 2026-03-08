@@ -1,12 +1,11 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
 import Link from "next/link";
 import styles from "./page.module.css";
 
@@ -22,6 +21,7 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/feed";
   const [error, setError] = useState<string | null>(null);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const {
     register,
@@ -32,20 +32,32 @@ function LoginForm() {
     defaultValues: { email: "", password: "" },
   });
 
+  useEffect(() => {
+    router.prefetch(callbackUrl);
+  }, [router, callbackUrl]);
+
   async function onSubmit(data: LoginFormData) {
     setError(null);
-    const result = await signIn("credentials", {
-      email: data.email,
-      password: data.password,
-      redirect: false,
-    });
-    if (result?.error) {
-      setError("Ogiltig e-post eller lösenord.");
-      return;
+    setIsRedirecting(true);
+    try {
+      const result = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
+      if (result?.error) {
+        setError("Ogiltig e-post eller lösenord.");
+        setIsRedirecting(false);
+        return;
+      }
+      router.push(callbackUrl);
+      router.refresh();
+    } catch {
+      setIsRedirecting(false);
     }
-    router.push(callbackUrl);
-    router.refresh();
   }
+
+  const isBusy = isSubmitting || isRedirecting;
 
   return (
     <div className={styles.page}>
@@ -84,9 +96,10 @@ function LoginForm() {
           <button
             type="submit"
             className={styles.submit}
-            disabled={isSubmitting}
+            disabled={isBusy}
+            aria-busy={isBusy}
           >
-            {isSubmitting ? "Loggar in..." : "Logga in"}
+            {isBusy ? "Loggar in..." : "Logga in"}
           </button>
         </form>
         <p className={styles.footer}>
