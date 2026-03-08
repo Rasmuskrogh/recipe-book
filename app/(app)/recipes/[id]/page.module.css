@@ -43,8 +43,17 @@
   margin-bottom: 1rem;
 }
 
-.author {
+.authorRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
   margin-bottom: 1rem;
+}
+
+.author {
+  flex: 1;
+  min-width: 0;
 }
 
 .authorLink {

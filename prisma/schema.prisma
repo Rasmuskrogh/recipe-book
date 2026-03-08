@@ -17,12 +17,15 @@ model User {
   emailVerified DateTime?
   image         String?
   bio           String?
+  lastSeen      DateTime?
+  isOnline      Boolean   @default(false)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
   accounts      Account[]
   sessions      Session[]
   recipes       Recipe[]
+  savedRecipes  SavedRecipe[]
 
   sentRequests     FriendRequest[] @relation("SentRequests")
   receivedRequests FriendRequest[] @relation("ReceivedRequests")
@@ -70,7 +73,7 @@ model Recipe {
   cookTime    Int?
   totalTime   Int?
   difficulty  String?
-  isPublic    Boolean  @default(true)
+  visibility  String   @default("public")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -80,6 +83,19 @@ model Recipe {
   ingredients Ingredient[]
   steps       RecipeStep[]
   tags        RecipeTag[]
+  savedBy     SavedRecipe[]
+}
+
+model SavedRecipe {
+  id        String   @id @default(cuid())
+  userId    String
+  recipeId  String
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, recipeId])
 }
 
 model Ingredient {

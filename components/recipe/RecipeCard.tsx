@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Avatar } from "@/components/ui/Avatar";
@@ -19,7 +20,9 @@ export interface RecipeCardProps {
     username: string;
     name?: string | null;
     image?: string | null;
+    isOnline?: boolean;
   };
+  savedByCurrentUser?: boolean;
 }
 
 const DIFFICULTY_LABELS: Record<string, string> = {
@@ -45,7 +48,10 @@ export function RecipeCard({
   cookTime,
   servings,
   author,
+  savedByCurrentUser = false,
 }: RecipeCardProps) {
+  const [saved, setSaved] = useState(savedByCurrentUser);
+  const [bookmarkLoading, setBookmarkLoading] = useState(false);
   const totalCook = [prepTime ?? 0, cookTime ?? 0].reduce((a, b) => a + b, 0);
   const authorName = author?.name || author?.username || "Okänd";
   const badgeClass =
@@ -54,6 +60,24 @@ export function RecipeCard({
       : difficulty === "hard"
         ? styles.badgeHard
         : styles.badgeMedium;
+
+  async function toggleBookmark(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (bookmarkLoading) return;
+    setBookmarkLoading(true);
+    try {
+      if (saved) {
+        const res = await fetch(`/api/recipes/${id}/save`, { method: "DELETE" });
+        if (res.ok) setSaved(false);
+      } else {
+        const res = await fetch(`/api/recipes/${id}/save`, { method: "POST" });
+        if (res.ok) setSaved(true);
+      }
+    } finally {
+      setBookmarkLoading(false);
+    }
+  }
 
   return (
     <Link href={`/recipes/${id}`} className={styles.card}>
@@ -92,6 +116,7 @@ export function RecipeCard({
             initials={getInitials(author?.name || author?.username)}
             size="sm"
             className={styles.authorAvatar}
+            isOnline={author?.isOnline}
           />
           <span className={styles.authorName}>{authorName}</span>
           {servings != null && servings > 0 && (

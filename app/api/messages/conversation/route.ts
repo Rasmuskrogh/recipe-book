@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/db/prisma";
+import { pusherServer } from "@/lib/pusher/server";
 
 export async function POST(request: NextRequest) {
   const session = await auth();
@@ -57,6 +58,11 @@ export async function POST(request: NextRequest) {
       },
     },
   });
+
+  await Promise.all([
+    pusherServer.trigger(`user-${userId}`, "new-conversation", { conversationId: conversation.id, type: "dm" }),
+    pusherServer.trigger(`user-${otherUserId}`, "new-conversation", { conversationId: conversation.id, type: "dm" }),
+  ]).catch(() => {});
 
   return NextResponse.json({ conversationId: conversation.id }, { status: 201 });
 }

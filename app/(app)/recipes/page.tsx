@@ -10,6 +10,7 @@ interface RecipeAuthor {
   username: string;
   name?: string | null;
   image?: string | null;
+  isOnline?: boolean;
 }
 
 interface RecipeItem {
@@ -23,6 +24,7 @@ interface RecipeItem {
   cookTime?: number | null;
   servings?: number;
   author?: RecipeAuthor;
+  savedByCurrentUser?: boolean;
 }
 
 const CATEGORY_OPTIONS = [
@@ -54,6 +56,7 @@ const TIME_OPTIONS = [
 export default function RecipesPage() {
   const { data: session, status } = useSession();
   const [mine, setMine] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [difficulty, setDifficulty] = useState("");
@@ -96,7 +99,7 @@ export default function RecipesPage() {
     return () => {
       cancelled = true;
     };
-  }, [mine, search, category, difficulty, timeFilter]);
+  }, [mine, saved, search, category, difficulty, timeFilter]);
 
   function clearFilters() {
     setSearch("");
@@ -209,6 +212,7 @@ export default function RecipesPage() {
                   cookTime={recipe.cookTime}
                   servings={recipe.servings}
                   author={recipe.author}
+                  savedByCurrentUser={recipe.savedByCurrentUser}
                 />
               ))}
             </div>

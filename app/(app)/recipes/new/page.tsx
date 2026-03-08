@@ -23,6 +23,12 @@ const stepSchema = z.object({
   duration: z.number().int().min(0).optional(),
 });
 
+const visibilityOptions = [
+  { value: "public", label: "Alla" },
+  { value: "friends", label: "Bara vänner" },
+  { value: "private", label: "Bara jag" },
+] as const;
+
 const categoryOptions = [
   { value: "", label: "—" },
   { value: "frukost", label: "Frukost" },
@@ -44,6 +50,7 @@ const formSchema = z.object({
   prepTime: z.number().int().min(0).optional(),
   cookTime: z.number().int().min(0).optional(),
   imageUrl: z.string().optional(),
+  visibility: z.enum(["public", "friends", "private"]),
   ingredients: z.array(ingredientSchema).min(1),
   steps: z.array(stepSchema).min(1),
 });
@@ -69,6 +76,7 @@ export default function NewRecipePage() {
       description: "",
       category: undefined,
       servings: 4,
+      visibility: "public",
       ingredients: [{ name: "", amount: 1, unit: "g" }],
       steps: [{ instruction: "" }],
     },
@@ -131,6 +139,17 @@ export default function NewRecipePage() {
           <select {...register("category")}>
             {categoryOptions.map((opt) => (
               <option key={opt.value || "none"} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className={styles.field}>
+          <label>Synlighet</label>
+          <select {...register("visibility")}>
+            {visibilityOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
                 {opt.label}
               </option>
             ))}

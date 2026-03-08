@@ -3,7 +3,9 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Avatar } from "@/components/ui/Avatar";
+import { getPusherClient } from "@/lib/pusher/client";
 import styles from "./GroupsList.module.css";
 
 type GroupItem = {
@@ -44,6 +46,8 @@ function formatTime(iso: string) {
 
 export function GroupsList() {
   const router = useRouter();
+  const { data: session } = useSession();
+  const currentUserId = session?.user?.id ?? null;
   const [groups, setGroups] = useState<GroupItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showNewGroup, setShowNewGroup] = useState(false);
@@ -63,6 +67,20 @@ export function GroupsList() {
   useEffect(() => {
     fetchGroups();
   }, [fetchGroups]);
+
+  useEffect(() => {
+    if (!currentUserId) return;
+    const pusher = getPusherClient();
+    if (!pusher) return;
+    const channel = pusher.subscribe(`user-${currentUserId}`);
+    channel.bind("new-conversation", () => {
+      fetchGroups();
+    });
+    return () => {
+      channel.unbind("new-conversation");
+      pusher.unsubscribe(`user-${currentUserId}`);
+    };
+  }, [currentUserId, fetchGroups]);
 
   useEffect(() => {
     if (!showNewGroup) return;

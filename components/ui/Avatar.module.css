@@ -1,12 +1,29 @@
 .avatar {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  overflow: hidden;
+  overflow: visible;
   background: var(--foreground);
   color: var(--background);
   flex-shrink: 0;
+}
+
+.onlineDot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 25%;
+  height: 25%;
+  min-width: 8px;
+  min-height: 8px;
+  max-width: 12px;
+  max-height: 12px;
+  border-radius: 50%;
+  background: #22c55e;
+  border: 2px solid var(--surface, #fff);
+  box-sizing: border-box;
 }
 
 .sm {

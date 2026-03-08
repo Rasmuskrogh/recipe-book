@@ -10,6 +10,7 @@ interface RecipeAuthor {
   username: string;
   name?: string | null;
   image?: string | null;
+  isOnline?: boolean;
 }
 
 interface RecipeItem {
@@ -22,6 +23,7 @@ interface RecipeItem {
   cookTime?: number | null;
   servings?: number;
   author?: RecipeAuthor;
+  savedByCurrentUser?: boolean;
 }
 
 export default function FeedPage() {
@@ -125,6 +127,7 @@ export default function FeedPage() {
                     cookTime={recipe.cookTime}
                     servings={recipe.servings}
                     author={recipe.author}
+                    savedByCurrentUser={recipe.savedByCurrentUser}
                   />
                 ))}
               </div>

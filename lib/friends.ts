@@ -133,3 +133,11 @@ export async function getPendingFriendRequestCount(userId: string): Promise<numb
     where: { receiverId: userId, status: "PENDING" },
   });
 }
+
+export async function getFriendIds(userId: string): Promise<string[]> {
+  const friendships = await prisma.friendship.findMany({
+    where: { OR: [{ userAId: userId }, { userBId: userId }] },
+    select: { userAId: true, userBId: true },
+  });
+  return friendships.map((f) => (f.userAId === userId ? f.userBId : f.userAId));
+}

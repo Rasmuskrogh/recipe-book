@@ -12,6 +12,7 @@ export interface NavbarProps {
     name?: string | null;
     image?: string | null;
     username?: string;
+    isOnline?: boolean;
   } | null;
   friendRequestCount?: number;
   unreadMessageCount?: number;
@@ -98,6 +99,7 @@ export function Navbar({
                   alt={user.name || user.username || "Användare"}
                   initials={getInitials(user.name || user.username)}
                   size="sm"
+                  isOnline={user.isOnline}
                 />
               </span>
             </Link>

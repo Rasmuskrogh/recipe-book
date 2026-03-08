@@ -8,11 +8,13 @@ export interface AvatarProps {
   initials?: string | null;
   size?: "sm" | "md" | "lg";
   className?: string;
+  /** Visa grön prick när användaren är online */
+  isOnline?: boolean;
 }
 
 const SIZE_PX = { sm: 32, md: 40, lg: 80 } as const;
 
-export function Avatar({ src, alt, initials, size = "md", className }: AvatarProps) {
+export function Avatar({ src, alt, initials, size = "md", className, isOnline }: AvatarProps) {
   const sizeClass =
     size === "sm" ? styles.sm : size === "lg" ? styles.lg : styles.md;
   const fallbackText =
@@ -37,6 +39,9 @@ export function Avatar({ src, alt, initials, size = "md", className }: AvatarPro
         <span className={styles.fallback} aria-hidden>
           {fallbackText}
         </span>
+      )}
+      {isOnline === true && (
+        <span className={styles.onlineDot} aria-label="Online" />
       )}
     </div>
   );

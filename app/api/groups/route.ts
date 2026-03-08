@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/db/prisma";
+import { pusherServer } from "@/lib/pusher/server";
 
 export async function GET() {
   const session = await auth();
@@ -144,8 +145,31 @@ export async function POST(request: NextRequest) {
       name: group.name,
       description: group.description,
       conversationId: conversation.id,
+      memberIds: validIds,
     };
   });
 
-  return NextResponse.json({ group: result }, { status: 201 });
+  await Promise.all(
+    result.memberIds.map((memberId: string) =>
+      pusherServer
+        .trigger(`user-${memberId}`, "new-conversation", {
+          conversationId: result.conversationId,
+          type: "group",
+          groupId: result.id,
+        })
+        .catch(() => {})
+    )
+  );
+
+  return NextResponse.json(
+    {
+      group: {
+        id: result.id,
+        name: result.name,
+        description: result.description,
+        conversationId: result.conversationId,
+      },
+    },
+    { status: 201 }
+  );
 }

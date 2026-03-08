@@ -1,0 +1,47 @@
+.bookmarkBtn,
+.bookmarkBtnSaved {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    color 0.2s,
+    background 0.2s,
+    border-color 0.2s;
+}
+
+.bookmarkBtn:hover,
+.bookmarkBtn:focus-visible {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.bookmarkBtnSaved {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.bookmarkBtnSaved:hover,
+.bookmarkBtnSaved:focus-visible {
+  opacity: 0.9;
+}
+
+.bookmarkBtn:disabled,
+.bookmarkBtnSaved:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.bookmarkIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+}

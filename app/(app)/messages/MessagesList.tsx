@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Avatar } from "@/components/ui/Avatar";
+import { getPusherClient } from "@/lib/pusher/client";
 import styles from "./MessagesList.module.css";
 
 type ConversationItem = {
@@ -61,6 +62,20 @@ export function MessagesList({ currentUserId }: { currentUserId: string }) {
   useEffect(() => {
     fetchConversations();
   }, [fetchConversations]);
+
+  useEffect(() => {
+    if (!currentUserId) return;
+    const pusher = getPusherClient();
+    if (!pusher) return;
+    const channel = pusher.subscribe(`user-${currentUserId}`);
+    channel.bind("new-conversation", () => {
+      fetchConversations();
+    });
+    return () => {
+      channel.unbind("new-conversation");
+      pusher.unsubscribe(`user-${currentUserId}`);
+    };
+  }, [currentUserId, fetchConversations]);
 
   useEffect(() => {
     if (!showNewDm) return;

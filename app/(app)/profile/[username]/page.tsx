@@ -25,13 +25,13 @@ export default async function ProfilePage({
   if (!user) notFound();
 
   const recipeCount = await prisma.recipe.count({
-    where: { authorId: user.id, isPublic: true },
+    where: { authorId: user.id, visibility: "public" },
   });
   const friendCount = await prisma.friendship.count({
     where: { OR: [{ userAId: user.id }, { userBId: user.id }] },
   });
   const recipes = await prisma.recipe.findMany({
-    where: { authorId: user.id, isPublic: true },
+    where: { authorId: user.id, visibility: "public" },
     select: { id: true, title: true, imageUrl: true },
     orderBy: { createdAt: "desc" },
   });

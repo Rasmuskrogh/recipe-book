@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { auth } from "@/lib/auth/auth";
+import { getFriendIds } from "@/lib/friends";
 import { z } from "zod";
 
 const ingredientSchema = z.object({
@@ -17,6 +18,8 @@ const stepSchema = z.object({
 
 const categoryEnum = z.enum(["frukost", "lunch", "middag", "dessert", "bakning", "snacks", "dryck", "ovrigt"]);
 
+const visibilityEnum = z.enum(["public", "friends", "private"]);
+
 const createRecipeSchema = z.object({
   title: z.string().min(1, "Titel krävs"),
   description: z.string().optional(),
@@ -26,6 +29,7 @@ const createRecipeSchema = z.object({
   prepTime: z.number().int().min(0).optional(),
   cookTime: z.number().int().min(0).optional(),
   imageUrl: z.string().url().optional().nullable(),
+  visibility: visibilityEnum.optional().default("public"),
   ingredients: z.array(ingredientSchema).min(1, "Minst en ingrediens"),
   steps: z.array(stepSchema).min(1, "Minst ett steg"),
   tags: z.array(z.string()).optional().default([]),
@@ -40,6 +44,7 @@ const DIFFICULTY_VALUES = ["easy", "medium", "hard"] as const;
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const mine = searchParams.get("mine") === "true";
+  const saved = searchParams.get("saved") === "true";
   const search = searchParams.get("search")?.trim() ?? "";
   const category = searchParams.get("category")?.trim();
   const difficulty = searchParams.get("difficulty")?.trim();
@@ -51,8 +56,26 @@ export async function GET(request: Request) {
     ? Math.min(MAX_LIMIT, Math.max(1, parseInt(limitParam, 10) || DEFAULT_LIMIT))
     : DEFAULT_LIMIT;
   const session = await auth();
+  const userId = session?.user?.id ?? null;
 
-  const baseWhere = mine && session?.user?.id ? { authorId: session.user.id } : { isPublic: true };
+  let baseWhere: object;
+  if (saved && userId) {
+    baseWhere = { savedBy: { some: { userId } } };
+  } else if (mine && userId) {
+    baseWhere = { authorId: userId };
+  } else if (userId) {
+    const friendIds = await getFriendIds(userId);
+    const visibleAuthorIds = [userId, ...friendIds];
+    baseWhere = {
+      OR: [
+        { visibility: "public" },
+        { visibility: "friends", authorId: { in: visibleAuthorIds } },
+        { visibility: "private", authorId: userId },
+      ],
+    };
+  } else {
+    baseWhere = { visibility: "public" };
+  }
 
   const conditions: object[] = [baseWhere];
   if (search.length > 0) {
@@ -95,8 +118,17 @@ export async function GET(request: Request) {
         cookTime: true,
         difficulty: true,
         author: {
-          select: { username: true, name: true, image: true },
+          select: { username: true, name: true, image: true, isOnline: true },
         },
+        ...(userId
+          ? {
+              savedBy: {
+                where: { userId },
+                select: { userId: true },
+                take: 1,
+              },
+            }
+          : {}),
       },
     });
   } catch (err) {
@@ -114,7 +146,15 @@ export async function GET(request: Request) {
   const hasMore = recipes.length > limit;
   const items = hasMore ? recipes.slice(0, limit) : recipes;
 
-  return NextResponse.json({ recipes: items, hasMore });
+  const normalized = items.map((r) => {
+    const { savedBy, ...rest } = r as typeof r & { savedBy?: { userId: string }[] };
+    return {
+      ...rest,
+      savedByCurrentUser: Array.isArray(savedBy) && savedBy.length > 0,
+    };
+  });
+
+  return NextResponse.json({ recipes: normalized, hasMore });
 }
 
 export async function POST(request: Request) {
@@ -144,6 +184,7 @@ export async function POST(request: Request) {
       ...data,
       imageUrl: data.imageUrl ?? undefined,
       category: data.category ?? undefined,
+      visibility: data.visibility ?? "public",
       totalTime,
       authorId: session.user.id,
       ingredients: {

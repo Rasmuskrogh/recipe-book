@@ -14,13 +14,13 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   }
 
   const recipeCount = await prisma.recipe.count({
-    where: { authorId: id, isPublic: true },
+    where: { authorId: id, visibility: "public" },
   });
   const friendCount = await prisma.friendship.count({
     where: { OR: [{ userAId: id }, { userBId: id }] },
   });
   const recipes = await prisma.recipe.findMany({
-    where: { authorId: id, isPublic: true },
+    where: { authorId: id, visibility: "public" },
     select: { id: true, title: true, imageUrl: true },
     orderBy: { createdAt: "desc" },
   });
