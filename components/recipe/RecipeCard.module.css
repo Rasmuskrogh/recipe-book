@@ -157,6 +157,22 @@
   overflow: hidden;
 }
 
+.desc p {
+  margin: 0 0 0.35em;
+}
+
+.desc p:last-child {
+  margin-bottom: 0;
+}
+
+.desc strong {
+  font-weight: 600;
+}
+
+.desc em {
+  font-style: italic;
+}
+
 .author {
   display: flex;
   align-items: center;

@@ -107,7 +107,7 @@ export function RecipeCard({
         </div>
         <h3 className={styles.title}>{title}</h3>
         {description && (
-          <p className={styles.desc}>{description}</p>
+          <div className={styles.desc} dangerouslySetInnerHTML={{ __html: description }} />
         )}
         <div className={styles.author}>
           <Avatar

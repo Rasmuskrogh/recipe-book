@@ -75,7 +75,10 @@ export default async function RecipePage({
         )}
         <h1 className={styles.title}>{recipe.title}</h1>
         {recipe.description && (
-          <p className={styles.description}>{recipe.description}</p>
+          <div
+            className={styles.description}
+            dangerouslySetInnerHTML={{ __html: recipe.description }}
+          />
         )}
         <div className={styles.meta}>
           {recipe.prepTime != null && (

@@ -14,10 +14,12 @@ export interface StepEditorProps {
 
 function Toolbar({ editor }: { editor: Editor | null }) {
   if (!editor) return null;
+  const preventFocus = (e: React.MouseEvent) => e.preventDefault();
   return (
     <div className={styles.toolbar} role="toolbar" aria-label="Formatering">
       <button
         type="button"
+        onMouseDown={preventFocus}
         onClick={() => editor.chain().focus().toggleBold().run()}
         className={editor.isActive("bold") ? styles.btnActive : styles.btn}
         aria-pressed={editor.isActive("bold")}
@@ -27,6 +29,7 @@ function Toolbar({ editor }: { editor: Editor | null }) {
       </button>
       <button
         type="button"
+        onMouseDown={preventFocus}
         onClick={() => editor.chain().focus().toggleItalic().run()}
         className={editor.isActive("italic") ? styles.btnActive : styles.btn}
         aria-pressed={editor.isActive("italic")}
@@ -37,6 +40,7 @@ function Toolbar({ editor }: { editor: Editor | null }) {
       <span className={styles.sep} aria-hidden />
       <button
         type="button"
+        onMouseDown={preventFocus}
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
         className={editor.isActive("heading", { level: 3 }) ? styles.btnActive : styles.btn}
         aria-pressed={editor.isActive("heading", { level: 3 })}
@@ -47,6 +51,7 @@ function Toolbar({ editor }: { editor: Editor | null }) {
       <span className={styles.sep} aria-hidden />
       <button
         type="button"
+        onMouseDown={preventFocus}
         onClick={() => editor.chain().focus().toggleBulletList().run()}
         className={editor.isActive("bulletList") ? styles.btnActive : styles.btn}
         aria-pressed={editor.isActive("bulletList")}
@@ -56,6 +61,7 @@ function Toolbar({ editor }: { editor: Editor | null }) {
       </button>
       <button
         type="button"
+        onMouseDown={preventFocus}
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
         className={editor.isActive("orderedList") ? styles.btnActive : styles.btn}
         aria-pressed={editor.isActive("orderedList")}

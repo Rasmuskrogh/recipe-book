@@ -146,22 +146,33 @@
 
 .stepRow {
   align-items: flex-start;
+  gap: 0.5rem;
 }
 
 .stepNum {
   font-weight: 600;
   min-width: 2rem;
+  flex-shrink: 0;
 }
 
-.stepRow textarea {
-  flex: 1;
-  min-width: 12rem;
-  padding: 0.4rem 0.5rem;
-  border: 1px solid var(--foreground);
-  border-radius: 0.25rem;
-  background: var(--background);
-  color: var(--foreground);
-  font-size: 0.875rem;
+.stepEditorCell {
+  flex: 1 1 16rem;
+  min-width: 0;
+  max-width: 28rem;
+}
+
+.stepActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+  .stepEditorCell {
+    flex-basis: 100%;
+    max-width: 100%;
+  }
 }
 
 .stepDuration {

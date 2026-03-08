@@ -132,7 +132,17 @@ export default function NewRecipePage() {
 
         <div className={styles.field}>
           <label>Beskrivning</label>
-          <textarea {...register("description")} rows={3} />
+          <Controller
+            control={control}
+            name="description"
+            render={({ field }) => (
+              <StepEditor
+                value={field.value ?? ""}
+                onChange={field.onChange}
+                placeholder="Beskriv receptet..."
+              />
+            )}
+          />
         </div>
 
         <div className={styles.field}>
@@ -255,27 +265,31 @@ export default function NewRecipePage() {
           {stepFields.map((field, i) => (
             <div key={field.id} className={styles.stepRow}>
               <span className={styles.stepNum}>{i + 1}.</span>
-              <Controller
-                control={control}
-                name={`steps.${i}.instruction`}
-                render={({ field: stepField }) => (
-                  <StepEditor
-                    value={stepField.value}
-                    onChange={stepField.onChange}
-                    placeholder="Instruktion"
-                  />
-                )}
-              />
-              <input
-                type="number"
-                min={0}
-                placeholder="Min"
-                {...register(`steps.${i}.duration`, { valueAsNumber: true })}
-                className={styles.stepDuration}
-              />
-              <button type="button" onClick={() => removeStep(i)} className={styles.removeBtn}>
-                Ta bort
-              </button>
+              <div className={styles.stepEditorCell}>
+                <Controller
+                  control={control}
+                  name={`steps.${i}.instruction`}
+                  render={({ field: stepField }) => (
+                    <StepEditor
+                      value={stepField.value}
+                      onChange={stepField.onChange}
+                      placeholder="Instruktion"
+                    />
+                  )}
+                />
+              </div>
+              <div className={styles.stepActions}>
+                <input
+                  type="number"
+                  min={0}
+                  placeholder="Min"
+                  {...register(`steps.${i}.duration`, { valueAsNumber: true })}
+                  className={styles.stepDuration}
+                />
+                <button type="button" onClick={() => removeStep(i)} className={styles.removeBtn}>
+                  Ta bort
+                </button>
+              </div>
             </div>
           ))}
           <button type="button" onClick={() => appendStep({ instruction: "" })}>
