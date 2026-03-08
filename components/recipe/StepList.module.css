@@ -29,6 +29,43 @@
 
 .instruction {
   flex: 1;
+  min-width: 0;
+}
+
+.instruction p {
+  margin: 0 0 0.5em;
+}
+
+.instruction p:last-child {
+  margin-bottom: 0;
+}
+
+.instruction strong {
+  font-weight: 600;
+}
+
+.instruction em {
+  font-style: italic;
+}
+
+.instruction ul,
+.instruction ol {
+  padding-left: 1.5rem;
+  margin: 0.5em 0;
+}
+
+.instruction li {
+  margin: 0.25em 0;
+}
+
+.instruction h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0.75em 0 0.35em;
+}
+
+.instruction h3:first-child {
+  margin-top: 0;
 }
 
 .duration {

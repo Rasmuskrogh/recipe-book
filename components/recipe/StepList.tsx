@@ -17,7 +17,10 @@ export function StepList({
         {steps.map((step, i) => (
           <li key={i} className={styles.item}>
             <span className={styles.num}>{i + 1}.</span>
-            <span className={styles.instruction}>{step.instruction}</span>
+            <div
+              className={styles.instruction}
+              dangerouslySetInnerHTML={{ __html: step.instruction || "" }}
+            />
             {step.duration != null && step.duration > 0 && (
               <span className={styles.duration}>— {step.duration} min</span>
             )}

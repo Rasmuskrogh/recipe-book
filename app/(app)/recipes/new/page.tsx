@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm, useFieldArray, useWatch } from "react-hook-form";
+import { useForm, useFieldArray, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Image from "next/image";
@@ -9,6 +9,7 @@ import { useState } from "react";
 import { UploadButton } from "@/lib/uploadthing-react";
 import { getUnitsForSystem } from "@/lib/units/converter";
 import type { UnitSystem } from "@/lib/units/types";
+import { StepEditor } from "@/components/recipe/StepEditor";
 import styles from "./page.module.css";
 
 const ingredientSchema = z.object({
@@ -254,10 +255,16 @@ export default function NewRecipePage() {
           {stepFields.map((field, i) => (
             <div key={field.id} className={styles.stepRow}>
               <span className={styles.stepNum}>{i + 1}.</span>
-              <textarea
-                placeholder="Instruktion"
-                {...register(`steps.${i}.instruction`)}
-                rows={2}
+              <Controller
+                control={control}
+                name={`steps.${i}.instruction`}
+                render={({ field: stepField }) => (
+                  <StepEditor
+                    value={stepField.value}
+                    onChange={stepField.onChange}
+                    placeholder="Instruktion"
+                  />
+                )}
               />
               <input
                 type="number"

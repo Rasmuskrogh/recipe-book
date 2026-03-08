@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 import styles from "./MobileNav.module.css";
 
 export interface MobileNavProps {
@@ -88,6 +89,17 @@ export function MobileNav({
         <span className={styles.icon}>👤</span>
         <span className={styles.label}>Profil</span>
       </Link>
+      {user && (
+        <button
+          type="button"
+          onClick={() => signOut({ callbackUrl: "/" })}
+          className={styles.logoutBtn}
+          aria-label="Logga ut"
+        >
+          <span className={styles.icon}>🚪</span>
+          <span className={styles.label}>Logga ut</span>
+        </button>
+      )}
     </nav>
   );
 }

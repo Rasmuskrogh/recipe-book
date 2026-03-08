@@ -1,0 +1,106 @@
+.wrap {
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  height: 1.75rem;
+  padding: 0 0.35rem;
+  border: none;
+  border-radius: 0.25rem;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.875rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.btn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.btnActive {
+  composes: btn;
+  background: var(--accent-light);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.sep {
+  width: 1px;
+  height: 1rem;
+  background: var(--border);
+  margin: 0 0.25rem;
+}
+
+.editorWrap {
+  min-height: 5rem;
+}
+
+.editorWrap :global(.ProseMirror) {
+  padding: 0.6rem 0.75rem;
+  min-height: 5rem;
+  outline: none;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.editorWrap :global(.ProseMirror p) {
+  margin: 0 0 0.5em;
+}
+
+.editorWrap :global(.ProseMirror p:last-child) {
+  margin-bottom: 0;
+}
+
+.editorWrap :global(.ProseMirror ul),
+.editorWrap :global(.ProseMirror ol) {
+  padding-left: 1.5rem;
+  margin: 0.5em 0;
+}
+
+.editorWrap :global(.ProseMirror li) {
+  margin: 0.2em 0;
+}
+
+.editorWrap :global(.ProseMirror h3) {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0.75em 0 0.35em;
+}
+
+.editorWrap :global(.ProseMirror h3:first-child) {
+  margin-top: 0;
+}
+
+.editorWrap :global(.ProseMirror p.is-editor-empty:first-child::before) {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--muted);
+  pointer-events: none;
+  height: 0;
+}
+
+.editorContent {
+  /* used by editorProps.attributes */
+}
