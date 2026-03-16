@@ -57,14 +57,14 @@
 }
 
 .row {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
+  max-width: 100%;
 }
 
 .row .field {
-  flex: 1;
-  min-width: 6rem;
+  min-width: 0;
 }
 
 .timeInputWrap {
@@ -87,8 +87,7 @@
 
 @media (max-width: 520px) {
   .row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
   }
 }
 

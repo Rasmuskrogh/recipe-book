@@ -182,6 +182,8 @@ export default function NewRecipePage() {
             <input type="number" min={1} {...register("servings", { valueAsNumber: true })} />
             {errors.servings && <span className={styles.fieldError}>{errors.servings.message}</span>}
           </div>
+        </div>
+        <div className={styles.row}>
           <div className={styles.field}>
             <label>Förberedelsetid</label>
             <div className={styles.timeInputWrap}>
@@ -213,6 +215,7 @@ export default function NewRecipePage() {
             )}
             <UploadButton
               endpoint="imageUploader"
+              content={{ button: "Välj fil" }}
               appearance={{
                 button: styles.uploadBtn,
                 allowedContent: styles.uploadAllowed,
