@@ -69,10 +69,13 @@
 
 .timeInputWrap {
   position: relative;
+  width: 100%;
 }
 
 .timeInputWrap input {
-  padding-right: 2.5rem;
+  width: 100%;
+  box-sizing: border-box;
+  padding-right: 2.25rem;
 }
 
 .timeSuffix {
@@ -85,9 +88,15 @@
   pointer-events: none;
 }
 
-@media (max-width: 520px) {
+@media (max-width: 900px) {
   .row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .row {
+    grid-template-columns: 1fr;
   }
 }
 

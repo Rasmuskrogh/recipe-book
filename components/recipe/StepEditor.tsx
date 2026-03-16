@@ -75,6 +75,7 @@ function Toolbar({ editor }: { editor: Editor | null }) {
 
 export function StepEditor({ value, onChange, placeholder = "Instruktion" }: StepEditorProps) {
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit.configure({
         heading: { levels: [3] },
