@@ -1,11 +1,11 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { signIn } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import styles from "./page.module.css";
 
@@ -17,7 +17,6 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/feed";
   const [error, setError] = useState<string | null>(null);
@@ -31,10 +30,6 @@ function LoginForm() {
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
   });
-
-  useEffect(() => {
-    router.prefetch(callbackUrl);
-  }, [router, callbackUrl]);
 
   async function onSubmit(data: LoginFormData) {
     setError(null);
@@ -50,8 +45,7 @@ function LoginForm() {
         setIsRedirecting(false);
         return;
       }
-      router.push(callbackUrl);
-      router.refresh();
+      window.location.href = callbackUrl || "/feed";
     } catch {
       setIsRedirecting(false);
     }
