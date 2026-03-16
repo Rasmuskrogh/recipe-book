@@ -183,12 +183,18 @@ export default function NewRecipePage() {
             {errors.servings && <span className={styles.fieldError}>{errors.servings.message}</span>}
           </div>
           <div className={styles.field}>
-            <label>Förberedelsetid (min)</label>
-            <input type="number" min={0} {...register("prepTime", { valueAsNumber: true })} />
+            <label>Förberedelsetid</label>
+            <div className={styles.timeInputWrap}>
+              <input type="number" min={0} {...register("prepTime", { valueAsNumber: true })} />
+              <span className={styles.timeSuffix}>min</span>
+            </div>
           </div>
           <div className={styles.field}>
-            <label>Tillagningstid (min)</label>
-            <input type="number" min={0} {...register("cookTime", { valueAsNumber: true })} />
+            <label>Tillagningstid</label>
+            <div className={styles.timeInputWrap}>
+              <input type="number" min={0} {...register("cookTime", { valueAsNumber: true })} />
+              <span className={styles.timeSuffix}>min</span>
+            </div>
           </div>
         </div>
 
@@ -207,6 +213,11 @@ export default function NewRecipePage() {
             )}
             <UploadButton
               endpoint="imageUploader"
+              appearance={{
+                button: styles.uploadBtn,
+                allowedContent: styles.uploadAllowed,
+                container: styles.uploadContainer,
+              }}
               onClientUploadComplete={(res) => {
                 if (res?.[0]?.url) setValue("imageUrl", res[0].url);
               }}
