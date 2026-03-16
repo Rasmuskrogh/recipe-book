@@ -194,24 +194,26 @@ export default function NewRecipePage() {
 
         <div className={styles.field}>
           <label>Bild</label>
-          {imageUrl && (
-            <Image
-              src={imageUrl}
-              alt=""
-              width={200}
-              height={200}
-              className={styles.preview}
-              unoptimized={imageUrl.startsWith("data:")}
+          <div className={styles.imageUploadZone}>
+            {imageUrl && (
+              <Image
+                src={imageUrl}
+                alt=""
+                width={200}
+                height={200}
+                className={styles.preview}
+                unoptimized={imageUrl.startsWith("data:")}
+              />
+            )}
+            <UploadButton
+              endpoint="imageUploader"
+              onClientUploadComplete={(res) => {
+                if (res?.[0]?.url) setValue("imageUrl", res[0].url);
+              }}
+              onUploadError={() => { }}
             />
-          )}
-          <UploadButton
-            endpoint="imageUploader"
-            onClientUploadComplete={(res) => {
-              if (res?.[0]?.url) setValue("imageUrl", res[0].url);
-            }}
-            onUploadError={() => { }}
-          />
-          <input type="hidden" {...register("imageUrl")} />
+            <input type="hidden" {...register("imageUrl")} />
+          </div>
         </div>
 
         <div className={styles.unitToggle}>
@@ -250,12 +252,12 @@ export default function NewRecipePage() {
                 ))}
               </select>
               <input placeholder="Not (valfritt)" {...register(`ingredients.${i}.notes`)} />
-              <button type="button" onClick={() => removeIng(i)} className={styles.removeBtn}>
-                Ta bort
+              <button type="button" onClick={() => removeIng(i)} className={styles.removeBtnIng} aria-label="Ta bort ingrediens">
+                ×
               </button>
             </div>
           ))}
-          <button type="button" onClick={() => appendIng({ name: "", amount: 1, unit: units[0] })}>
+          <button type="button" onClick={() => appendIng({ name: "", amount: 1, unit: units[0] })} className={styles.appendBtn}>
             + Lägg till ingrediens
           </button>
         </section>
@@ -292,7 +294,7 @@ export default function NewRecipePage() {
               </div>
             </div>
           ))}
-          <button type="button" onClick={() => appendStep({ instruction: "" })}>
+          <button type="button" onClick={() => appendStep({ instruction: "" })} className={styles.appendBtn}>
             + Lägg till steg
           </button>
         </section>
