@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 import { UploadButton } from "@/lib/uploadthing-react";
 import { Avatar } from "@/components/ui/Avatar";
 import styles from "./EditProfileForm.module.css";
@@ -46,22 +47,29 @@ export function EditProfileForm({
 
   async function onSubmit(data: EditProfileFormData) {
     setError(null);
-    const res = await fetch(`/api/users/${userId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: data.name.trim(),
-        bio: data.bio?.trim() || null,
-        image: data.image || null,
-      }),
-    });
-    if (!res.ok) {
+    try {
+      const res = await fetch(`/api/users/${userId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: data.name.trim(),
+          bio: data.bio?.trim() || null,
+          image: data.image || null,
+        }),
+      });
       const json = await res.json().catch(() => ({}));
-      setError(json.error ?? "Kunde inte spara.");
-      return;
+      if (!res.ok) {
+        setError(json.error ?? "Kunde inte spara.");
+        toast.error("Något gick fel, försök igen");
+        return;
+      }
+      toast.success("Sparades!");
+      router.push(`/profile/${username}`);
+      router.refresh();
+    } catch {
+      setError("Något gick fel, försök igen");
+      toast.error("Något gick fel, försök igen");
     }
-    router.push(`/profile/${username}`);
-    router.refresh();
   }
 
   return (

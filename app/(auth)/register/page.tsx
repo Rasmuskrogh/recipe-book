@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
 import styles from "./page.module.css";
+import { toast } from "react-hot-toast";
 
 const registerSchema = z
   .object({
@@ -43,35 +44,47 @@ export default function RegisterPage() {
 
   async function onSubmit(data: RegisterFormData) {
     setError(null);
-    const res = await fetch("/api/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: data.name,
-        email: data.email,
-        password: data.password,
-      }),
-    });
-    const json = await res.json().catch(() => ({}));
+    try {
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          password: data.password,
+        }),
+      });
+      const json = await res.json().catch(() => ({}));
 
-    if (!res.ok) {
-      const err = json.error;
-      if (err && typeof err === "object" && !Array.isArray(err)) {
-        if (err.email?.[0]) setFormError("email", { message: err.email[0] });
-        if (err.name?.[0]) setFormError("name", { message: err.name[0] });
-        if (err.password?.[0])
-          setFormError("password", { message: err.password[0] });
-        if (err.email || err.name || err.password) return;
+      if (!res.ok) {
+        const err = json.error;
+        if (err && typeof err === "object" && !Array.isArray(err)) {
+          if (err.email?.[0])
+            setFormError("email", { message: err.email[0] });
+          if (err.name?.[0])
+            setFormError("name", { message: err.name[0] });
+          if (err.password?.[0])
+            setFormError("password", { message: err.password[0] });
+          if (err.email || err.name || err.password) {
+            toast.error("Något gick fel, försök igen");
+            return;
+          }
+        }
+        setError(
+          typeof json.error === "string"
+            ? json.error
+            : "Något gick fel, försök igen",
+        );
+        toast.error("Något gick fel, försök igen");
+        return;
       }
-      setError(
-        typeof json.error === "string"
-          ? json.error
-          : "Registreringen misslyckades."
-      );
-      return;
+
+      router.push("/login?callbackUrl=/feed");
+      router.refresh();
+    } catch {
+      setError("Något gick fel, försök igen");
+      toast.error("Något gick fel, försök igen");
     }
-    router.push("/login?callbackUrl=/feed");
-    router.refresh();
   }
 
   return (

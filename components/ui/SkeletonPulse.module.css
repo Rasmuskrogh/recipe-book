@@ -1,0 +1,157 @@
+.skeleton {
+  background: var(--border);
+  opacity: 0.75;
+  animation: skeletonPulse 1.2s ease-in-out infinite;
+  border-radius: 0.6rem;
+}
+
+@keyframes skeletonPulse {
+  0% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.45;
+  }
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.titleBlock {
+  height: 1.9rem;
+  width: 14rem;
+  border-radius: 0.8rem;
+}
+
+.buttonBlock {
+  height: 2.6rem;
+  width: 14rem;
+  border-radius: 999px;
+}
+
+.filtersGrid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.inputBlock {
+  height: 2.6rem;
+  border-radius: 0.7rem;
+}
+
+.radioBlockRow {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.radioBlock {
+  height: 1.5rem;
+  width: 7.5rem;
+  border-radius: 999px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 0.9rem;
+  border-radius: 0.9rem;
+}
+
+.imageBlock {
+  width: 100%;
+  aspect-ratio: 1 / 0.7;
+  border-radius: 0.75rem;
+}
+
+.lineBlockSm {
+  height: 1rem;
+  width: 70%;
+}
+
+.lineBlockLg {
+  height: 0.85rem;
+  width: 95%;
+  border-radius: 0.5rem;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.listItem {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.8rem;
+  border-radius: 0.9rem;
+}
+
+.avatarBlock {
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 999px;
+}
+
+.textStack {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.lineBlockRow1 {
+  height: 1rem;
+  width: 55%;
+}
+
+.lineBlockRow2 {
+  height: 0.85rem;
+  width: 78%;
+}
+
+.tabsRow {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.tabBlock {
+  height: 2.4rem;
+  width: 10rem;
+  border-radius: 999px;
+}
+
+.sectionTitleBlock {
+  height: 1.2rem;
+  width: 10rem;
+  border-radius: 0.6rem;
+}
+
+.modalHintBlock {
+  height: 1rem;
+  width: 18rem;
+}
+

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Avatar } from "@/components/ui/Avatar";
 import { getPusherClient } from "@/lib/pusher/client";
+import { toast } from "react-hot-toast";
 import styles from "./MessagesList.module.css";
 
 type ConversationItem = {
@@ -53,10 +54,17 @@ export function MessagesList({ currentUserId }: { currentUserId: string }) {
   const [creating, setCreating] = useState(false);
 
   const fetchConversations = useCallback(async () => {
-    const res = await fetch("/api/messages");
-    const data = await res.json();
-    if (res.ok) setConversations(data.conversations ?? []);
-    setLoading(false);
+    try {
+      const res = await fetch("/api/messages");
+      if (!res.ok) throw new Error("Kunde inte hämta konversationer");
+      const data = await res.json();
+      setConversations(data.conversations ?? []);
+    } catch {
+      toast.error("Något gick fel, försök igen");
+      setConversations([]);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -79,10 +87,17 @@ export function MessagesList({ currentUserId }: { currentUserId: string }) {
 
   useEffect(() => {
     if (!showNewDm) return;
-    fetch("/api/friends")
-      .then((r) => r.json())
-      .then((d) => setFriends(d.friends ?? []))
-      .catch(() => setFriends([]));
+    (async () => {
+      try {
+        const res = await fetch("/api/friends");
+        if (!res.ok) throw new Error("Kunde inte hämta vänner");
+        const d = await res.json();
+        setFriends(d.friends ?? []);
+      } catch {
+        toast.error("Något gick fel, försök igen");
+        setFriends([]);
+      }
+    })();
   }, [showNewDm]);
 
   const startDm = async (userId: string) => {
@@ -93,12 +108,17 @@ export function MessagesList({ currentUserId }: { currentUserId: string }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId }),
       });
-      const data = await res.json();
-      if (res.ok && data.conversationId) {
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error ?? "Kunde inte starta DM");
+      if (data.conversationId) {
         setShowNewDm(false);
         setDmSearch("");
         router.push("/messages/" + data.conversationId);
+      } else {
+        toast.error("Något gick fel, försök igen");
       }
+    } catch {
+      toast.error("Något gick fel, försök igen");
     } finally {
       setCreating(false);
     }
@@ -174,7 +194,7 @@ export function MessagesList({ currentUserId }: { currentUserId: string }) {
       {loading ? (
         <p className={styles.empty}>Laddar…</p>
       ) : conversations.length === 0 ? (
-        <p className={styles.empty}>Inga konversationer än. Starta en ny DM.</p>
+        <p className={styles.empty}>Inga konversationer än</p>
       ) : (
         <ul className={styles.convList}>
           {conversations.map((c) => {

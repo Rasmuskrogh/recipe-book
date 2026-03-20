@@ -6,6 +6,7 @@ import { useChat, type ChatMessage } from "@/hooks/useChat";
 import { MessageBubble } from "@/components/chat/MessageBubble";
 import { MessageInput } from "@/components/chat/MessageInput";
 import { Avatar } from "@/components/ui/Avatar";
+import { toast } from "react-hot-toast";
 import styles from "./GroupChatPage.module.css";
 
 type Member = {
@@ -59,9 +60,18 @@ export function GroupChatPage({
   }, [conversationId, initialMessages, setMessages]);
 
   useEffect(() => {
-    fetch(`/api/conversations/${conversationId}/read`, { method: "POST" })
-      .then(() => router.refresh())
-      .catch(() => { });
+    (async () => {
+      try {
+        const res = await fetch(
+          `/api/conversations/${conversationId}/read`,
+          { method: "POST" },
+        );
+        if (!res.ok) throw new Error("Kunde inte markera som läst");
+        router.refresh();
+      } catch {
+        toast.error("Något gick fel, försök igen");
+      }
+    })();
   }, [conversationId, router]);
 
   useEffect(() => {
@@ -71,19 +81,30 @@ export function GroupChatPage({
     });
   }, [messages]);
 
-  const fetchMembers = useCallback(() => {
-    fetch(`/api/groups/${groupId}/members`)
-      .then((r) => r.json())
-      .then((d) => d.members && setMembers(d.members))
-      .catch(() => { });
+  const fetchMembers = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/groups/${groupId}/members`);
+      if (!res.ok) throw new Error("Kunde inte hämta medlemmar");
+      const d = await res.json();
+      setMembers(d.members ?? []);
+    } catch {
+      toast.error("Något gick fel, försök igen");
+    }
   }, [groupId]);
 
   useEffect(() => {
     if (showAddModal) {
-      fetch("/api/friends")
-        .then((r) => r.json())
-        .then((d) => setFriends(d.friends ?? []))
-        .catch(() => setFriends([]));
+      (async () => {
+        try {
+          const res = await fetch("/api/friends");
+          if (!res.ok) throw new Error("Kunde inte hämta vänner");
+          const d = await res.json();
+          setFriends(d.friends ?? []);
+        } catch {
+          toast.error("Något gick fel, försök igen");
+          setFriends([]);
+        }
+      })();
       fetchMembers();
     }
   }, [showAddModal, fetchMembers]);
@@ -116,13 +137,14 @@ export function GroupChatPage({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ memberIds: Array.from(selectedToAdd) }),
       });
-      if (res.ok) {
-        setShowAddModal(false);
-        setSelectedToAdd(new Set());
-        setAddSearch("");
-        fetchMembers();
-        router.refresh();
-      }
+      if (!res.ok) throw new Error("Kunde inte lägga till medlemmar");
+      setShowAddModal(false);
+      setSelectedToAdd(new Set());
+      setAddSearch("");
+      fetchMembers();
+      router.refresh();
+    } catch {
+      toast.error("Något gick fel, försök igen");
     } finally {
       setAdding(false);
     }
@@ -247,7 +269,7 @@ export function GroupChatPage({
 
       <div className={styles.messages} ref={scrollRef}>
         {messages.length === 0 && (
-          <p className={styles.empty}>Inga meddelanden än. Skriv något!</p>
+          <p className={styles.empty}>Inga meddelanden än</p>
         )}
         {messages.map((m) => (
           <MessageBubble

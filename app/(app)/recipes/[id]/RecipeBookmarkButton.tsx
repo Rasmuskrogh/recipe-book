@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import styles from "./RecipeBookmarkButton.module.css";
+import { toast } from "react-hot-toast";
 
 export function RecipeBookmarkButton({
   recipeId,
@@ -18,12 +19,22 @@ export function RecipeBookmarkButton({
     setLoading(true);
     try {
       if (saved) {
-        const res = await fetch(`/api/recipes/${recipeId}/save`, { method: "DELETE" });
-        if (res.ok) setSaved(false);
+        const res = await fetch(`/api/recipes/${recipeId}/save`, {
+          method: "DELETE",
+        });
+        if (!res.ok) throw new Error("Kunde inte ta bort bokmärke");
+        setSaved(false);
+        toast.success("Borttaget");
       } else {
-        const res = await fetch(`/api/recipes/${recipeId}/save`, { method: "POST" });
-        if (res.ok) setSaved(true);
+        const res = await fetch(`/api/recipes/${recipeId}/save`, {
+          method: "POST",
+        });
+        if (!res.ok) throw new Error("Kunde inte spara bokmärke");
+        setSaved(true);
+        toast.success("Sparades!");
       }
+    } catch {
+      toast.error("Något gick fel, försök igen");
     } finally {
       setLoading(false);
     }

@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { auth } from "@/lib/auth/auth";
 
 export async function POST(
-  _request: NextRequest,
+  _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
@@ -33,7 +32,7 @@ export async function POST(
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();

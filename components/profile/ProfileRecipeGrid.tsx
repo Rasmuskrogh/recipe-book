@@ -15,7 +15,7 @@ export interface ProfileRecipeGridProps {
 
 export function ProfileRecipeGrid({ recipes }: ProfileRecipeGridProps) {
   if (recipes.length === 0) {
-    return <p className={styles.empty}>Inga publika recept än.</p>;
+    return <p className={styles.empty}>Inga recept än, skapa ditt första!</p>;
   }
   return (
     <div className={styles.profileRecipeGrid}>

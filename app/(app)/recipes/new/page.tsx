@@ -11,6 +11,7 @@ import { getUnitsForSystem } from "@/lib/units/converter";
 import type { UnitSystem } from "@/lib/units/types";
 import { StepEditor } from "@/components/recipe/StepEditor";
 import styles from "./page.module.css";
+import { toast } from "react-hot-toast";
 
 const ingredientSchema = z.object({
   name: z.string().min(1),
@@ -97,25 +98,40 @@ export default function NewRecipePage() {
 
   async function onSubmit(data: FormData) {
     setError(null);
-    const res = await fetch("/api/recipes", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...data,
-        imageUrl: data.imageUrl || null,
-        category: data.category || null,
-        ingredients: data.ingredients.filter((i) => i.name.trim()).map((i) => ({ ...i, amount: Number(i.amount) })),
-        steps: data.steps.filter((s) => s.instruction.trim()).map((s) => ({ ...s, duration: s.duration ? Number(s.duration) : undefined })),
-      }),
-    });
-    if (!res.ok) {
+    try {
+      const res = await fetch("/api/recipes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...data,
+          imageUrl: data.imageUrl || null,
+          category: data.category || null,
+          ingredients: data.ingredients
+            .filter((i) => i.name.trim())
+            .map((i) => ({ ...i, amount: Number(i.amount) })),
+          steps: data.steps
+            .filter((s) => s.instruction.trim())
+            .map((s) => ({
+              ...s,
+              duration: s.duration ? Number(s.duration) : undefined,
+            })),
+        }),
+      });
+
       const json = await res.json().catch(() => ({}));
-      setError(json.error?.title?.[0] ?? "Kunde inte spara recept.");
-      return;
+      if (!res.ok) {
+        setError(json.error?.title?.[0] ?? "Något gick fel, försök igen");
+        toast.error("Något gick fel, försök igen");
+        return;
+      }
+
+      toast.success("Sparades!");
+      router.push(`/recipes/${json.id}`);
+      router.refresh();
+    } catch {
+      setError("Något gick fel, försök igen");
+      toast.error("Något gick fel, försök igen");
     }
-    const recipe = await res.json();
-    router.push(`/recipes/${recipe.id}`);
-    router.refresh();
   }
 
   return (

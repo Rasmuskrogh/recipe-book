@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useChat, type ChatMessage } from "@/hooks/useChat";
 import { MessageBubble } from "@/components/chat/MessageBubble";
 import { MessageInput } from "@/components/chat/MessageInput";
+import { toast } from "react-hot-toast";
 import styles from "./ChatView.module.css";
 
 interface ChatViewProps {
@@ -30,9 +31,18 @@ export function ChatView({
   }, [conversationId]);
 
   useEffect(() => {
-    fetch(`/api/conversations/${conversationId}/read`, { method: "POST" })
-      .then(() => router.refresh())
-      .catch(() => { });
+    (async () => {
+      try {
+        const res = await fetch(
+          `/api/conversations/${conversationId}/read`,
+          { method: "POST" },
+        );
+        if (!res.ok) throw new Error("Kunde inte markera som läst");
+        router.refresh();
+      } catch {
+        toast.error("Något gick fel, försök igen");
+      }
+    })();
   }, [conversationId, router]);
 
   useEffect(() => {
@@ -49,7 +59,7 @@ export function ChatView({
       </header>
       <div className={styles.messages} ref={scrollRef}>
         {messages.length === 0 && (
-          <p className={styles.empty}>Inga meddelanden än. Skriv något!</p>
+          <p className={styles.empty}>Inga meddelanden än</p>
         )}
         {messages.map((m) => (
           <MessageBubble

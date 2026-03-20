@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { RecipeCard } from "@/components/recipe/RecipeCard";
+import { toast } from "react-hot-toast";
 import styles from "./page.module.css";
 
 interface RecipeAuthor {
@@ -146,7 +147,10 @@ export default function RecipesPage() {
         const data = (await res.json()) as { recipes: RecipeItem[] };
         if (!cancelled) setRecipes(data.recipes ?? []);
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : "Kunde inte hämta recept");
+        if (!cancelled) {
+          setError("Något gick fel, försök igen");
+          toast.error("Något gick fel, försök igen");
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -272,21 +276,15 @@ export default function RecipesPage() {
       {!loading && !error && (
         <>
           {recipes.length === 0 ? (
-            <p className={styles.empty}>
-              {effectiveFilter === "mine"
-                ? "Du har inga recept än."
-                : effectiveFilter === "saved"
-                  ? "Du har inga bokmärkta recept än."
-                  : "Inga recept att visa."}
-              {effectiveFilter === "all" && (
-                <>
-                  {" "}
-                  <Link href="/recipes/new" className={styles.emptyLink}>
-                    Skapa ditt första recept
-                  </Link>
-                </>
-              )}
-            </p>
+            <>
+              <p className={styles.empty}>Inga recept än, skapa ditt första!</p>
+              <Link
+                href="/recipes/new"
+                className={styles.emptyLink}
+              >
+                Skapa ditt första recept
+              </Link>
+            </>
           ) : (
             <div className={styles.grid}>
               {recipes.map((recipe) => (

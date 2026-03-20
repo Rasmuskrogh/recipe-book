@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Avatar } from "@/components/ui/Avatar";
 import { getInitials } from "@/lib/utils/format";
 import styles from "./RecipeCard.module.css";
+import { toast } from "react-hot-toast";
 
 export interface RecipeCardProps {
   id: string;
@@ -69,11 +70,17 @@ export function RecipeCard({
     try {
       if (saved) {
         const res = await fetch(`/api/recipes/${id}/save`, { method: "DELETE" });
-        if (res.ok) setSaved(false);
+        if (!res.ok) throw new Error("Kunde inte ta bort bokmärke");
+        setSaved(false);
+        toast.success("Borttaget");
       } else {
         const res = await fetch(`/api/recipes/${id}/save`, { method: "POST" });
-        if (res.ok) setSaved(true);
+        if (!res.ok) throw new Error("Kunde inte spara bokmärke");
+        setSaved(true);
+        toast.success("Sparades!");
       }
+    } catch {
+      toast.error("Något gick fel, försök igen");
     } finally {
       setBookmarkLoading(false);
     }

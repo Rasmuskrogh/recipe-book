@@ -4,6 +4,7 @@ import styles from "./FriendButton.module.css";
 import type { FriendshipStatus } from "@/types/social";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 
 export interface FriendButtonProps {
   userId: string
@@ -39,13 +40,12 @@ export function FriendButton(props: FriendButtonProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ receiverId: userId }),
       });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        alert(data.error ?? "Kunde inte skicka förfrågan");
-        return;
-      }
+      if (!res.ok) throw new Error("Kunde inte skicka förfrågan");
       onAdd?.();
+      toast.success("Förfrågan skickad");
       router.refresh();
+    } catch {
+      toast.error("Något gick fel, försök igen");
     } finally {
       setLoading(false);
     }
@@ -60,13 +60,12 @@ export function FriendButton(props: FriendButtonProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ requestId, action: "accept" }),
       });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        alert(data.error ?? "Kunde inte acceptera");
-        return;
-      }
+      if (!res.ok) throw new Error("Kunde inte acceptera");
       onAccept?.();
+      toast.success("Vänskap accepterad");
       router.refresh();
+    } catch {
+      toast.error("Något gick fel, försök igen");
     } finally {
       setLoading(false);
     }
@@ -81,13 +80,12 @@ export function FriendButton(props: FriendButtonProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ requestId, action: "reject" }),
       });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        alert(data.error ?? "Kunde inte avvisa");
-        return;
-      }
+      if (!res.ok) throw new Error("Kunde inte avvisa");
       onReject?.();
+      toast.success("Förfrågan avvisad");
       router.refresh();
+    } catch {
+      toast.error("Något gick fel, försök igen");
     } finally {
       setLoading(false);
     }
@@ -99,13 +97,12 @@ export function FriendButton(props: FriendButtonProps) {
       const res = await fetch("/api/friends?userId=" + encodeURIComponent(userId), {
         method: "DELETE",
       });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        alert(data.error ?? "Kunde inte ta bort vän");
-        return;
-      }
+      if (!res.ok) throw new Error("Kunde inte ta bort vän");
       onRemove?.();
+      toast.success("Borttaget");
       router.refresh();
+    } catch {
+      toast.error("Något gick fel, försök igen");
     } finally {
       setLoading(false);
     }

@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { getPusherClient } from "@/lib/pusher/client";
+import { toast } from "react-hot-toast";
 
 export type ChatMessage = {
   id: string;
@@ -59,6 +60,8 @@ export function useChat(conversationId: string | null) {
             return [...prev, data.message];
           });
         }
+      } catch {
+        toast.error("Något gick fel, försök igen");
       } finally {
         setIsLoading(false);
       }

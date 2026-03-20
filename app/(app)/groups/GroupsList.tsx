@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Avatar } from "@/components/ui/Avatar";
 import { getPusherClient } from "@/lib/pusher/client";
+import { toast } from "react-hot-toast";
 import styles from "./GroupsList.module.css";
 
 type GroupItem = {
@@ -58,10 +59,17 @@ export function GroupsList() {
   const [creating, setCreating] = useState(false);
 
   const fetchGroups = useCallback(async () => {
-    const res = await fetch("/api/groups");
-    const data = await res.json();
-    if (res.ok) setGroups(data.groups ?? []);
-    setLoading(false);
+    try {
+      const res = await fetch("/api/groups");
+      if (!res.ok) throw new Error("Kunde inte hämta grupper");
+      const data = await res.json();
+      setGroups(data.groups ?? []);
+    } catch {
+      toast.error("Något gick fel, försök igen");
+      setGroups([]);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -84,10 +92,17 @@ export function GroupsList() {
 
   useEffect(() => {
     if (!showNewGroup) return;
-    fetch("/api/friends")
-      .then((r) => r.json())
-      .then((d) => setFriends(d.friends ?? []))
-      .catch(() => setFriends([]));
+    (async () => {
+      try {
+        const res = await fetch("/api/friends");
+        if (!res.ok) throw new Error("Kunde inte hämta vänner");
+        const d = await res.json();
+        setFriends(d.friends ?? []);
+      } catch {
+        toast.error("Något gick fel, försök igen");
+        setFriends([]);
+      }
+    })();
   }, [showNewGroup]);
 
   const createGroup = async () => {
@@ -103,15 +118,21 @@ export function GroupsList() {
           memberIds: Array.from(selectedMemberIds),
         }),
       });
-      const data = await res.json();
-      if (res.ok && data.group?.conversationId) {
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error ?? "Kunde inte skapa grupp");
+      if (data.group?.conversationId) {
         setShowNewGroup(false);
         setGroupName("");
         setGroupDescription("");
         setSelectedMemberIds(new Set());
         router.push("/groups/" + data.group.id);
         fetchGroups();
+        toast.success("Grupp skapad");
+      } else {
+        toast.error("Något gick fel, försök igen");
       }
+    } catch {
+      toast.error("Något gick fel, försök igen");
     } finally {
       setCreating(false);
     }
@@ -215,7 +236,7 @@ export function GroupsList() {
         <p className={styles.empty}>Laddar…</p>
       ) : groups.length === 0 ? (
         <p className={styles.empty}>
-          Du är inte med i några grupper än. Skapa en ny grupp.
+          Du är inte med i någon grupp än
         </p>
       ) : (
         <ul className={styles.groupList}>

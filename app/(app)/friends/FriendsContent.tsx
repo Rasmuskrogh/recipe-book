@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Avatar } from "@/components/ui/Avatar";
 import type { FriendEntry, IncomingRequestEntry } from "@/lib/friends";
 import { getPusherClient } from "@/lib/pusher/client";
+import { toast } from "react-hot-toast";
 import styles from "./FriendsContent.module.css";
 
 type SearchUser = {
@@ -104,10 +105,13 @@ export function FriendsContent({
       const res = await fetch(
         "/api/users?search=" + encodeURIComponent(q.trim())
       );
+      if (!res.ok) throw new Error("Kunde inte söka användare");
       const data = await res.json();
       setSearchResults(data.users ?? []);
+      // intentionally silent: empty results are a valid outcome
     } catch {
       setSearchResults([]);
+      toast.error("Något gick fel, försök igen");
     } finally {
       setSearching(false);
     }
@@ -132,13 +136,12 @@ export function FriendsContent({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ receiverId }),
       });
-      if (res.ok) {
-        setSearchResults((prev) => prev.filter((u) => u.id !== receiverId));
-        router.refresh();
-      } else {
-        const data = await res.json().catch(() => ({}));
-        alert(data.error ?? "Kunde inte skicka förfrågan");
-      }
+      if (!res.ok) throw new Error("Kunde inte skicka förfrågan");
+      setSearchResults((prev) => prev.filter((u) => u.id !== receiverId));
+      toast.success("Förfrågan skickad");
+      router.refresh();
+    } catch {
+      toast.error("Något gick fel, försök igen");
     } finally {
       setSendingId(null);
     }
@@ -146,27 +149,37 @@ export function FriendsContent({
 
   const handleAccept = async (requestId: string) => {
     const req = requests.find((r) => r.id === requestId);
-    const res = await fetch("/api/friends", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ requestId, action: "accept" }),
-    });
-    if (res.ok && req) {
-      setRequests((prev) => prev.filter((r) => r.id !== requestId));
-      setFriends((prev) => [...prev, req.sender]);
-      router.refresh();
+    try {
+      const res = await fetch("/api/friends", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ requestId, action: "accept" }),
+      });
+      if (!res.ok) throw new Error("Kunde inte acceptera");
+      if (req) {
+        setRequests((prev) => prev.filter((r) => r.id !== requestId));
+        setFriends((prev) => [...prev, req.sender]);
+        toast.success("Vänskap accepterad");
+        router.refresh();
+      }
+    } catch {
+      toast.error("Något gick fel, försök igen");
     }
   };
 
   const handleReject = async (requestId: string) => {
-    const res = await fetch("/api/friends", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ requestId, action: "reject" }),
-    });
-    if (res.ok) {
+    try {
+      const res = await fetch("/api/friends", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ requestId, action: "reject" }),
+      });
+      if (!res.ok) throw new Error("Kunde inte avvisa");
       setRequests((prev) => prev.filter((r) => r.id !== requestId));
+      toast.success("Förfrågan avvisad");
       router.refresh();
+    } catch {
+      toast.error("Något gick fel, försök igen");
     }
   };
 
@@ -249,7 +262,9 @@ export function FriendsContent({
       {tab === "friends" && (
         <section className={styles.section}>
           {friends.length === 0 ? (
-            <p className={styles.empty}>Du har inga vänner än.</p>
+            <p className={styles.empty}>
+              Du har inga vänner än, sök efter folk att lägga till
+            </p>
           ) : (
             <ul className={styles.list}>
               {friends.map((f) => (

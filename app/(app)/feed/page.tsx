@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { RecipeCard } from "@/components/recipe/RecipeCard";
+import { toast } from "react-hot-toast";
 import styles from "./page.module.css";
 
 interface RecipeAuthor {
@@ -37,23 +38,32 @@ export default function FeedPage() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/recipes?page=1&limit=12")
-      .then((res) => {
+
+    async function load() {
+      try {
+        setLoading(true);
+        setError(null);
+        const res = await fetch("/api/recipes?page=1&limit=12");
         if (!res.ok) throw new Error("Kunde inte hämta recept");
-        return res.json();
-      })
-      .then((data: { recipes: RecipeItem[]; hasMore: boolean }) => {
+        const data = (await res.json()) as {
+          recipes: RecipeItem[];
+          hasMore: boolean;
+        };
         if (cancelled) return;
         setRecipes(data.recipes ?? []);
         setHasMore(data.hasMore ?? false);
         setPage(1);
-      })
-      .catch((err) => {
-        if (!cancelled) setError(err.message);
-      })
-      .finally(() => {
+      } catch {
+        if (!cancelled) {
+          setError("Något gick fel, försök igen");
+          toast.error("Något gick fel, försök igen");
+        }
+      } finally {
         if (!cancelled) setLoading(false);
-      });
+      }
+    }
+
+    load();
     return () => {
       cancelled = true;
     };
@@ -62,18 +72,26 @@ export default function FeedPage() {
   function loadMore() {
     const nextPage = page + 1;
     setLoadingMore(true);
-    fetch(`/api/recipes?page=${nextPage}&limit=12`)
-      .then((res) => {
+    (async () => {
+      try {
+        const res = await fetch(
+          `/api/recipes?page=${nextPage}&limit=12`,
+        );
         if (!res.ok) throw new Error("Kunde inte hämta fler recept");
-        return res.json();
-      })
-      .then((data: { recipes: RecipeItem[]; hasMore: boolean }) => {
+        const data = (await res.json()) as {
+          recipes: RecipeItem[];
+          hasMore: boolean;
+        };
         setRecipes((prev) => [...prev, ...(data.recipes ?? [])]);
         setHasMore(data.hasMore ?? false);
         setPage(nextPage);
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoadingMore(false));
+      } catch {
+        setError("Något gick fel, försök igen");
+        toast.error("Något gick fel, försök igen");
+      } finally {
+        setLoadingMore(false);
+      }
+    })();
   }
 
   const fullName = session?.user?.name || session?.user?.username || "där";
@@ -103,7 +121,9 @@ export default function FeedPage() {
         <>
           {recipes.length === 0 ? (
             <div className={styles.empty}>
-              <p className={styles.emptyText}>Inga recept i flödet än.</p>
+              <p className={styles.emptyText}>
+                Inga recept än, skapa ditt första!
+              </p>
               <p className={styles.emptySub}>
                 Bli först med att dela –{" "}
                 <Link href="/recipes/new" className={styles.emptyLink}>

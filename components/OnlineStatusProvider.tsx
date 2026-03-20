@@ -1,21 +1,35 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { getPusherClient } from "@/lib/pusher/client";
+import { toast } from "react-hot-toast";
 
 export function OnlineStatusProvider() {
   const { data: session, status } = useSession();
   const userId = session?.user?.id;
+  const didToastRef = useRef(false);
+
+  async function patchStatus(isOnline: boolean, toastOnError: boolean) {
+    try {
+      const res = await fetch("/api/users/status", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isOnline }),
+      });
+      if (!res.ok) throw new Error("Kunde inte uppdatera status");
+    } catch {
+      if (toastOnError && !didToastRef.current) {
+        didToastRef.current = true;
+        toast.error("Något gick fel, försök igen");
+      }
+    }
+  }
 
   useEffect(() => {
     if (status !== "authenticated" || !userId) return;
 
-    fetch("/api/users/status", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ isOnline: true }),
-    }).catch(() => { });
+    void patchStatus(true, true);
 
     const pusher = getPusherClient();
     if (pusher) {
@@ -28,11 +42,7 @@ export function OnlineStatusProvider() {
     }
 
     function setOffline() {
-      fetch("/api/users/status", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isOnline: false }),
-      }).catch(() => { });
+      void patchStatus(false, false);
     }
 
     function handleVisibilityChange() {
