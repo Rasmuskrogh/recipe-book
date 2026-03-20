@@ -45,8 +45,15 @@ export function OnlineStatusProvider() {
       void patchStatus(false, false);
     }
 
+    function setOnline() {
+      void patchStatus(true, false);
+    }
+
     function handleVisibilityChange() {
-      if (document.visibilityState === "hidden") setOffline();
+      if (document.visibilityState === "visible") setOnline();
+    }
+    function handleFocus() {
+      setOnline();
     }
     function handleBeforeUnload() {
       setOffline();
@@ -55,12 +62,20 @@ export function OnlineStatusProvider() {
       setOffline();
     }
 
+    // Keepalive: refresh online status periodically while session is active.
+    const heartbeat = window.setInterval(() => {
+      if (document.visibilityState === "visible") setOnline();
+    }, 30000);
+
     document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleFocus);
     window.addEventListener("beforeunload", handleBeforeUnload);
     window.addEventListener("pagehide", handlePageHide);
 
     return () => {
+      window.clearInterval(heartbeat);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleFocus);
       window.removeEventListener("beforeunload", handleBeforeUnload);
       window.removeEventListener("pagehide", handlePageHide);
       setOffline();
