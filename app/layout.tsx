@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "@/components/providers";
+import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 
 export const metadata: Metadata = {
   title: "Recept & Nätverk",
   description: "Receptsajt med socialt nätverk",
+  manifest: "/manifest.json",
+  themeColor: "#c8622a",
 };
 
 export default function RootLayout({
@@ -14,8 +17,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="sv" suppressHydrationWarning>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#c8622a" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Smakbok" />
+      </head>
       <body suppressHydrationWarning>
-        <Providers>{children}</Providers>
+        <Providers>
+          <ServiceWorkerRegistration />
+          {children}
+        </Providers>
       </body>
     </html>
   );
