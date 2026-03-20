@@ -8,7 +8,6 @@ import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import styles from "./page.module.css";
-import { toast } from "react-hot-toast";
 
 const loginSchema = z.object({
   email: z.string().email("Ange en giltig e-post"),
@@ -43,7 +42,6 @@ function LoginForm() {
       });
       if (result?.error) {
         setError("Ogiltig e-post eller lösenord.");
-        toast.error("Ogiltig e-post eller lösenord.");
         setIsRedirecting(false);
         return;
       }
@@ -51,7 +49,6 @@ function LoginForm() {
     } catch {
       setIsRedirecting(false);
       setError("Något gick fel, försök igen");
-      toast.error("Något gick fel, försök igen");
     }
   }
 

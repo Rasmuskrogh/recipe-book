@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
 import styles from "./page.module.css";
-import { toast } from "react-hot-toast";
 
 const registerSchema = z
   .object({
@@ -66,7 +65,6 @@ export default function RegisterPage() {
           if (err.password?.[0])
             setFormError("password", { message: err.password[0] });
           if (err.email || err.name || err.password) {
-            toast.error("Något gick fel, försök igen");
             return;
           }
         }
@@ -75,7 +73,6 @@ export default function RegisterPage() {
             ? json.error
             : "Något gick fel, försök igen",
         );
-        toast.error("Något gick fel, försök igen");
         return;
       }
 
@@ -83,7 +80,6 @@ export default function RegisterPage() {
       router.refresh();
     } catch {
       setError("Något gick fel, försök igen");
-      toast.error("Något gick fel, försök igen");
     }
   }
 
