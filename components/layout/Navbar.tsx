@@ -38,7 +38,7 @@ export function Navbar({
   return (
     <nav className={styles.navbar}>
       <Link href="/feed" className={styles.logo}>
-        Recept & Nätverk
+        platemate
       </Link>
       <ul className={styles.navLinks}>
         {NAV_LINKS.map(({ href, label }) => {

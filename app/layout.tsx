@@ -4,10 +4,14 @@ import { Providers } from "@/components/providers";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 
 export const metadata: Metadata = {
-  title: "Recept & Nätverk",
+  title: "platemate",
   description: "Receptsajt med socialt nätverk",
   manifest: "/manifest.json",
   themeColor: "#c8622a",
+  icons: {
+    icon: "/favicon.svg",
+    apple: "/favicon.svg",
+  }
 };
 
 export default function RootLayout({
@@ -22,7 +26,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#c8622a" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Smakbok" />
+        <meta name="apple-mobile-web-app-title" content="platemate" />
       </head>
       <body suppressHydrationWarning>
         <Providers>

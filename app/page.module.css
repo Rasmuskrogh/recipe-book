@@ -1,13 +1,138 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap");
+
 .page {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
+  background: #faf8f5;
+  font-family: "DM Sans", sans-serif;
+  color: #1a1a18;
 }
 
-.page nav {
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: #faf8f5;
+  position: relative;
+}
+
+.heroContent {
+  text-align: center;
+  max-width: 600px;
+}
+
+.logo {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(3rem, 10vw, 6rem);
+  font-weight: 700;
+  color: #c8622a;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 1rem;
+}
+
+.tagline {
+  font-size: clamp(1rem, 3vw, 1.35rem);
+  color: #5a5248;
+  font-weight: 300;
+  margin-bottom: 2.5rem;
+  line-height: 1.5;
+}
+
+.buttons {
   display: flex;
   gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btnPrimary {
+  background: #c8622a;
+  color: white;
+  padding: 0.85rem 2rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: opacity 0.2s;
+}
+
+.btnPrimary:hover {
+  opacity: 0.88;
+}
+
+.btnOutline {
+  background: transparent;
+  color: #c8622a;
+  padding: 0.85rem 2rem;
+  border-radius: 8px;
+  border: 1.5px solid #c8622a;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.btnOutline:hover {
+  background: #c8622a;
+  color: white;
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  padding: 5rem 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.feature {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #ede9e2;
+}
+
+.icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.feature h2 {
+  font-family: "Playfair Display", serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #1a1a18;
+}
+
+.feature p {
+  font-size: 0.9rem;
+  color: #8a8478;
+  line-height: 1.6;
+}
+
+.footer {
+  text-align: center;
+  padding: 2rem;
+  color: #8a8478;
+  font-size: 0.85rem;
+  border-top: 1px solid #ede9e2;
+  margin-top: auto;
+}
+
+@media (max-width: 640px) {
+  .features {
+    grid-template-columns: 1fr;
+    padding: 3rem 1.5rem;
+  }
 }

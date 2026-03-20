@@ -1,6 +1,6 @@
 {
-  "name": "Smakbok",
-  "short_name": "Smakbok",
+  "name": "platemate",
+  "short_name": "platemate",
   "description": "Receptapp för familj och vänner",
   "start_url": "/feed",
   "display": "standalone",
