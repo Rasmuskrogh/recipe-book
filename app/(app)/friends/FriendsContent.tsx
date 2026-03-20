@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Avatar } from "@/components/ui/Avatar";
 import type { FriendEntry, IncomingRequestEntry } from "@/lib/friends";
+import { getPusherClient } from "@/lib/pusher/client";
 import styles from "./FriendsContent.module.css";
 
 type SearchUser = {
@@ -35,6 +36,63 @@ export function FriendsContent({
   const [searching, setSearching] = useState(false);
   const [sendingId, setSendingId] = useState<string | null>(null);
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const friendIdsKey = friends
+    .map((f) => f.id)
+    .slice()
+    .sort()
+    .join("|");
+
+  useEffect(() => {
+    if (tab !== "friends") return;
+    if (!friendIdsKey) return;
+
+    const pusher = getPusherClient();
+    if (!pusher) return;
+
+    let cancelled = false;
+
+    const friendIds = friendIdsKey.split("|").filter(Boolean);
+    const channelNames: string[] = [];
+
+    const setOnlineFor = (friendId: string, isOnline: boolean) => {
+      if (cancelled) return;
+      setFriends((prev) =>
+        prev.map((f) => (f.id === friendId ? { ...f, isOnline } : f))
+      );
+    };
+
+    for (const friendId of friendIds) {
+      const channelName = `presence-user-${friendId}`;
+      channelNames.push(channelName);
+      const channel: any = pusher.subscribe(channelName);
+
+      const syncFromChannel = () => {
+        const members = channel?.members;
+        const online = !!members && Object.keys(members).includes(friendId);
+        setOnlineFor(friendId, online);
+      };
+
+      channel.bind("pusher:subscription_succeeded", syncFromChannel);
+      channel.bind("pusher:member_added", (member: any) => {
+        if (member?.id === friendId) setOnlineFor(friendId, true);
+      });
+      channel.bind("pusher:member_removed", (member: any) => {
+        if (member?.id === friendId) syncFromChannel();
+      });
+    }
+
+    return () => {
+      cancelled = true;
+      for (const channelName of channelNames) {
+        try {
+          pusher.unsubscribe(channelName);
+        } catch {
+          // ignore
+        }
+      }
+    };
+  }, [tab, friendIdsKey]);
 
   const runSearch = useCallback(async (q: string) => {
     if (!q.trim()) {
@@ -205,6 +263,7 @@ export function FriendsContent({
                       alt={f.name ?? f.username}
                       size="md"
                       className={styles.avatar}
+                      isOnline={f.isOnline}
                     />
                     <div className={styles.friendInfo}>
                       <span className={styles.friendName}>
@@ -242,6 +301,7 @@ export function FriendsContent({
                       alt={r.sender.name ?? r.sender.username}
                       size="md"
                       className={styles.avatar}
+                      isOnline={r.sender.isOnline}
                     />
                     <div className={styles.friendInfo}>
                       <span className={styles.friendName}>

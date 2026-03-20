@@ -7,6 +7,9 @@
 .actions {
   margin-top: 1rem;
   margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
 .editButton {
@@ -21,6 +24,22 @@
 
 .editButton:hover {
   opacity: 0.9;
+}
+
+.savedRecipesButton {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+  background: transparent;
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.12));
+  border-radius: 0.25rem;
+  text-decoration: none;
+}
+
+.savedRecipesButton:hover {
+  background: var(--surface, rgba(0, 0, 0, 0.03));
 }
 
 .recipesSection {

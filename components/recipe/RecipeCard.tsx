@@ -93,6 +93,21 @@ export function RecipeCard({
         ) : (
           <div className={styles.placeholder} aria-hidden />
         )}
+        <button
+          type="button"
+          onClick={toggleBookmark}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          disabled={bookmarkLoading}
+          className={saved ? styles.bookmarkBtnSaved : styles.bookmarkBtn}
+          aria-label={saved ? "Ta bort bokmärke" : "Spara recept"}
+        >
+          <span className={styles.bookmarkChar} aria-hidden>
+            {saved ? "★" : "☆"}
+          </span>
+        </button>
       </div>
       <div className={styles.body}>
         <div className={styles.meta}>

@@ -57,9 +57,14 @@ export default async function ProfilePage({
       <ProfileHeader user={profile} isOwnProfile={isOwnProfile} />
       <div className={styles.actions}>
         {isOwnProfile ? (
-          <Link href="/profile/edit" className={styles.editButton}>
-            Redigera profil
-          </Link>
+          <>
+            <Link href="/profile/edit" className={styles.editButton}>
+              Redigera profil
+            </Link>
+            <Link href="/recipes?filter=saved" className={styles.savedRecipesButton}>
+              Visa sparade recept
+            </Link>
+          </>
         ) : friendship ? (
           <FriendButton
             userId={user.id}

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import { RecipeCard } from "@/components/recipe/RecipeCard";
 import styles from "./page.module.css";
 
@@ -55,8 +56,15 @@ const TIME_OPTIONS = [
 
 export default function RecipesPage() {
   const { data: session, status } = useSession();
-  const [mine, setMine] = useState(false);
-  const [saved, setSaved] = useState(false);
+
+  type RecipeFilter = "all" | "mine" | "saved";
+  const searchParams = useSearchParams();
+  const filterFromQuery = searchParams.get("filter");
+  const [filter, setFilter] = useState<RecipeFilter>(() => {
+    if (filterFromQuery === "mine" || filterFromQuery === "saved") return filterFromQuery;
+    return "all";
+  });
+
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [difficulty, setDifficulty] = useState("");
@@ -65,7 +73,15 @@ export default function RecipesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const hasActiveFilters = search.trim() !== "" || category !== "" || difficulty !== "" || timeFilter !== "";
+  const userId = session?.user?.id ?? null;
+  const effectiveFilter: RecipeFilter = userId ? filter : "all";
+
+  const hasActiveFilters =
+    effectiveFilter !== "all" ||
+    search.trim() !== "" ||
+    category !== "" ||
+    difficulty !== "" ||
+    timeFilter !== "";
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -73,35 +89,77 @@ export default function RecipesPage() {
       setError(null);
     });
     let cancelled = false;
-    const params = new URLSearchParams();
-    if (mine) params.set("mine", "true");
-    if (search.trim()) params.set("search", search.trim());
-    if (category) params.set("category", category);
-    if (difficulty) params.set("difficulty", difficulty);
-    if (timeFilter === "30") params.set("maxTime", "30");
-    if (timeFilter === "60") params.set("maxTime", "60");
-    if (timeFilter === "60+") params.set("minTime", "60");
-    const url = `/api/recipes?${params.toString()}`;
-    fetch(url)
-      .then((res) => {
-        if (!res.ok) throw new Error("Kunde inte hämta recept");
-        return res.json();
-      })
-      .then((data: { recipes: RecipeItem[] }) => {
-        if (!cancelled) setRecipes(data.recipes ?? []);
-      })
-      .catch((err) => {
-        if (!cancelled) setError(err.message);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
+
+    function applyClientFilters(list: RecipeItem[]) {
+      const q = search.trim().toLowerCase();
+      const cat = category || "";
+      const diff = difficulty || "";
+
+      return list.filter((r) => {
+        const titleOk = q ? (r.title ?? "").toLowerCase().includes(q) : true;
+        const categoryOk = cat ? r.category === cat : true;
+        const difficultyOk = diff ? r.difficulty === diff : true;
+
+        const totalTime = (r.prepTime ?? 0) + (r.cookTime ?? 0);
+        const timeOk =
+          timeFilter === ""
+            ? true
+            : timeFilter === "30"
+              ? totalTime <= 30
+              : timeFilter === "60"
+                ? totalTime <= 60
+                : timeFilter === "60+"
+                  ? totalTime >= 60
+                  : true;
+
+        return titleOk && categoryOk && difficultyOk && timeOk;
       });
+    }
+
+    async function run() {
+      try {
+        if (effectiveFilter === "saved") {
+          const res = await fetch("/api/recipes/saved");
+          if (!res.ok) throw new Error("Kunde inte hämta sparade recept");
+          const data: { recipes: RecipeItem[] } = await res.json();
+          const normalized: RecipeItem[] = (data.recipes ?? []).map((r) => ({
+            ...r,
+            savedByCurrentUser: true,
+          }));
+          const filtered = applyClientFilters(normalized);
+          if (!cancelled) setRecipes(filtered ?? []);
+          return;
+        }
+
+        const params = new URLSearchParams();
+        if (effectiveFilter === "mine") params.set("mine", "true");
+        if (search.trim()) params.set("search", search.trim());
+        if (category) params.set("category", category);
+        if (difficulty) params.set("difficulty", difficulty);
+        if (timeFilter === "30") params.set("maxTime", "30");
+        if (timeFilter === "60") params.set("maxTime", "60");
+        if (timeFilter === "60+") params.set("minTime", "60");
+
+        const url = `/api/recipes?${params.toString()}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Kunde inte hämta recept");
+        const data = (await res.json()) as { recipes: RecipeItem[] };
+        if (!cancelled) setRecipes(data.recipes ?? []);
+      } catch (err) {
+        if (!cancelled) setError(err instanceof Error ? err.message : "Kunde inte hämta recept");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    run();
     return () => {
       cancelled = true;
     };
-  }, [mine, saved, search, category, difficulty, timeFilter]);
+  }, [effectiveFilter, userId, search, category, difficulty, timeFilter]);
 
   function clearFilters() {
+    setFilter("all");
     setSearch("");
     setCategory("");
     setDifficulty("");
@@ -162,18 +220,45 @@ export default function RecipesPage() {
             </option>
           ))}
         </select>
-        {status !== "loading" && session?.user && (
+        <div className={styles.filterRadios} role="radiogroup" aria-label="Receptfilter">
           <label className={styles.toggleLabel}>
             <input
-              type="checkbox"
-              checked={mine}
-              onChange={(e) => setMine(e.target.checked)}
+              type="radio"
+              name="recipeFilter"
+              checked={effectiveFilter === "all"}
+              onChange={() => setFilter("all")}
               className={styles.toggle}
-              aria-label="Visa endast mina recept"
+              aria-label="Visa alla recept"
             />
-            <span className={styles.toggleText}>Mina recept</span>
+            <span className={styles.toggleText}>Alla</span>
           </label>
-        )}
+          {status !== "loading" && session?.user && (
+            <>
+              <label className={styles.toggleLabel}>
+                <input
+                  type="radio"
+                  name="recipeFilter"
+                  checked={effectiveFilter === "mine"}
+                  onChange={() => setFilter("mine")}
+                  className={styles.toggle}
+                  aria-label="Visa endast mina recept"
+                />
+                <span className={styles.toggleText}>Mina recept</span>
+              </label>
+              <label className={styles.toggleLabel}>
+                <input
+                  type="radio"
+                  name="recipeFilter"
+                  checked={effectiveFilter === "saved"}
+                  onChange={() => setFilter("saved")}
+                  className={styles.toggle}
+                  aria-label="Visa sparade recept"
+                />
+                <span className={styles.toggleText}>Sparade</span>
+              </label>
+            </>
+          )}
+        </div>
         {hasActiveFilters && (
           <button type="button" onClick={clearFilters} className={styles.clearBtn}>
             Rensa filter
@@ -188,8 +273,12 @@ export default function RecipesPage() {
         <>
           {recipes.length === 0 ? (
             <p className={styles.empty}>
-              {mine ? "Du har inga recept än." : "Inga recept att visa."}
-              {!mine && (
+              {effectiveFilter === "mine"
+                ? "Du har inga recept än."
+                : effectiveFilter === "saved"
+                  ? "Du har inga bokmärkta recept än."
+                  : "Inga recept att visa."}
+              {effectiveFilter === "all" && (
                 <>
                   {" "}
                   <Link href="/recipes/new" className={styles.emptyLink}>

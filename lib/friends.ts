@@ -7,6 +7,7 @@ export type FriendEntry = {
   username: string;
   image: string | null;
   recipeCount: number;
+  isOnline: boolean;
 };
 
 export type IncomingRequestEntry = {
@@ -27,6 +28,7 @@ export async function getFriendsData(userId: string) {
             name: true,
             username: true,
             image: true,
+            isOnline: true,
             _count: { select: { recipes: true } },
           },
         },
@@ -36,6 +38,7 @@ export async function getFriendsData(userId: string) {
             name: true,
             username: true,
             image: true,
+            isOnline: true,
             _count: { select: { recipes: true } },
           },
         },
@@ -50,6 +53,7 @@ export async function getFriendsData(userId: string) {
             name: true,
             username: true,
             image: true,
+            isOnline: true,
             _count: { select: { recipes: true } },
           },
         },
@@ -66,6 +70,7 @@ export async function getFriendsData(userId: string) {
       username: friend.username,
       image: friend.image,
       recipeCount: friend._count.recipes,
+      isOnline: friend.isOnline,
     };
   });
 
@@ -79,6 +84,7 @@ export async function getFriendsData(userId: string) {
       username: r.sender.username,
       image: r.sender.image,
       recipeCount: r.sender._count.recipes,
+      isOnline: r.sender.isOnline,
     },
   }));
 
