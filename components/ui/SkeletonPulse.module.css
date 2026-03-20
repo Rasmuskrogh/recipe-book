@@ -5,6 +5,10 @@
   border-radius: 0.6rem;
 }
 
+.skeletonInheritRadius {
+  border-radius: inherit !important;
+}
+
 @keyframes skeletonPulse {
   0% {
     opacity: 0.45;

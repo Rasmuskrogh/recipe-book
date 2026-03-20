@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Avatar } from "@/components/ui/Avatar";
 import { getPusherClient } from "@/lib/pusher/client";
 import { toast } from "react-hot-toast";
+import skeleton from "@/components/ui/SkeletonPulse.module.css";
 import styles from "./MessagesList.module.css";
 
 type ConversationItem = {
@@ -192,7 +193,43 @@ export function MessagesList({ currentUserId }: { currentUserId: string }) {
       )}
 
       {loading ? (
-        <p className={styles.empty}>Laddar…</p>
+        <ul className={styles.convList} aria-hidden>
+          {Array.from({ length: 7 }).map((_, i) => (
+            <li key={i}>
+              <div className={styles.convRow}>
+                <div
+                  className={styles.avatar}
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 999,
+                    background: "var(--border)",
+                    opacity: 0.75,
+                  }}
+                />
+                <div className={styles.convBody}>
+                  <div
+                    className={`${skeleton.skeleton} ${skeleton.skeletonInheritRadius}`}
+                    style={{ height: "1rem", width: "55%" }}
+                  />
+                  <div
+                    className={`${skeleton.skeleton} ${skeleton.skeletonInheritRadius}`}
+                    style={{ height: "0.8rem", width: "90%" }}
+                  />
+                </div>
+                <span
+                  className={styles.unreadBadge}
+                  style={{ background: "var(--border)", color: "transparent" }}
+                  aria-hidden
+                />
+                <div
+                  className={`${skeleton.skeleton} ${skeleton.skeletonInheritRadius}`}
+                  style={{ height: "0.75rem", width: "4.5rem", flexShrink: 0 }}
+                />
+              </div>
+            </li>
+          ))}
+        </ul>
       ) : conversations.length === 0 ? (
         <p className={styles.empty}>Inga konversationer än</p>
       ) : (

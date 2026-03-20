@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import { Avatar } from "@/components/ui/Avatar";
 import { getPusherClient } from "@/lib/pusher/client";
 import { toast } from "react-hot-toast";
+import skeleton from "@/components/ui/SkeletonPulse.module.css";
 import styles from "./GroupsList.module.css";
 
 type GroupItem = {
@@ -233,7 +234,37 @@ export function GroupsList() {
       )}
 
       {loading ? (
-        <p className={styles.empty}>Laddar…</p>
+        <ul className={styles.groupList} aria-hidden>
+          {Array.from({ length: 7 }).map((_, i) => (
+            <li key={i}>
+              <div className={styles.groupRow}>
+                <div
+                  className={`${skeleton.skeleton} ${styles.groupIcon}`}
+                  style={{ borderRadius: "0.5rem" }}
+                />
+                <div className={styles.groupBody}>
+                  <div
+                    className={`${skeleton.skeleton} ${skeleton.skeletonInheritRadius}`}
+                    style={{ height: "1rem", width: "55%" }}
+                  />
+                  <div
+                    className={`${skeleton.skeleton} ${skeleton.skeletonInheritRadius}`}
+                    style={{ height: "0.8rem", width: "92%" }}
+                  />
+                </div>
+                <span
+                  className={styles.unreadBadge}
+                  style={{ background: "var(--border)", color: "transparent" }}
+                  aria-hidden
+                />
+                <div
+                  className={`${skeleton.skeleton} ${skeleton.skeletonInheritRadius}`}
+                  style={{ height: "0.75rem", width: "4.2rem" }}
+                />
+              </div>
+            </li>
+          ))}
+        </ul>
       ) : groups.length === 0 ? (
         <p className={styles.empty}>
           Du är inte med i någon grupp än

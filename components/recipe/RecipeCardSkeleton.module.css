@@ -1,0 +1,48 @@
+.titleBlock {
+  height: 2.7rem;
+  width: 92%;
+}
+
+.descBlock {
+  height: 2.35rem;
+  width: 100%;
+  border-radius: 0.5rem;
+}
+
+.badgeBlock {
+  height: 1.1rem;
+  width: 5.4rem;
+  border-radius: 0.35rem;
+}
+
+.timeBlock {
+  height: 0.95rem;
+  width: 6.8rem;
+  border-radius: 0.35rem;
+}
+
+.authorNameBlock {
+  height: 0.9rem;
+  width: 7.2rem;
+  border-radius: 0.45rem;
+}
+
+.servingsBlock {
+  height: 0.9rem;
+  width: 4.2rem;
+  border-radius: 0.45rem;
+  margin-left: auto;
+}
+
+.imgPulse {
+  width: 100%;
+  height: 100%;
+  border-radius: 0 !important;
+}
+
+.bookmarkPulse {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px !important;
+}
+

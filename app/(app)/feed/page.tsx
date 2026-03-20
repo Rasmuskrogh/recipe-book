@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { RecipeCard } from "@/components/recipe/RecipeCard";
 import { toast } from "react-hot-toast";
+import { RecipeCardSkeleton } from "@/components/recipe/RecipeCardSkeleton";
 import styles from "./page.module.css";
 
 interface RecipeAuthor {
@@ -115,7 +116,13 @@ export default function FeedPage() {
       </header>
 
       {error && <p className={styles.error}>{error}</p>}
-      {loading && <p className={styles.loading}>Laddar recept...</p>}
+      {loading && (
+        <div className={styles.grid} aria-hidden>
+          {Array.from({ length: 9 }).map((_, i) => (
+            <RecipeCardSkeleton key={i} />
+          ))}
+        </div>
+      )}
 
       {!loading && !error && (
         <>
