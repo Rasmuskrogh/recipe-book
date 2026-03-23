@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { auth } from "@/lib/auth/auth";
+import { sendPushNotification } from "@/lib/push/sendPushNotification";
 
 export async function POST(
   _request: Request,
@@ -14,7 +15,7 @@ export async function POST(
 
   const recipe = await prisma.recipe.findUnique({
     where: { id: recipeId },
-    select: { id: true },
+    select: { id: true, authorId: true },
   });
   if (!recipe) {
     return NextResponse.json({ error: "Recept hittades inte" }, { status: 404 });
@@ -27,6 +28,19 @@ export async function POST(
     create: { userId: session.user.id, recipeId },
     update: {},
   });
+
+  if (recipe.authorId !== session.user.id) {
+    const saver = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { name: true, username: true },
+    });
+    const saverName = saver?.name || saver?.username || "Någon";
+    await sendPushNotification(
+      recipe.authorId,
+      "Recept sparat",
+      `${saverName} sparade ditt recept`
+    );
+  }
 
   return NextResponse.json({ saved: true }, { status: 201 });
 }

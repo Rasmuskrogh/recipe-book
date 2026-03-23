@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/db/prisma";
 import { pusherServer } from "@/lib/pusher/server";
+import { sendPushNotification } from "@/lib/push/sendPushNotification";
 
 export async function GET() {
   const session = await auth();
@@ -165,6 +166,25 @@ export async function POST(request: NextRequest) {
   };
 
   await pusherServer.trigger(`conversation-${conversationId}`, "new-message", { message: payload });
+
+  const recipients = await prisma.conversationParticipant.findMany({
+    where: {
+      conversationId,
+      userId: { not: userId },
+    },
+    select: { userId: true },
+  });
+
+  const senderName = message.sender.name || message.sender.username || "Någon";
+  await Promise.all(
+    recipients.map((recipient) =>
+      sendPushNotification(
+        recipient.userId,
+        "Nytt meddelande",
+        `${senderName} skickade dig ett meddelande`
+      )
+    )
+  );
 
   return NextResponse.json({ message: payload }, { status: 201 });
 }

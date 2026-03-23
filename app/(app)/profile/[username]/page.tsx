@@ -5,6 +5,7 @@ import { getFriendshipStatus } from "@/lib/friends";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileRecipeGrid } from "@/components/profile/ProfileRecipeGrid";
 import { FriendButton } from "@/components/social/FriendButton";
+import { PushNotificationToggle } from "@/components/ui/PushNotificationToggle";
 import type { UserProfile } from "@/types/user";
 import Link from "next/link";
 import styles from "./page.module.css";
@@ -64,6 +65,10 @@ export default async function ProfilePage({
             <Link href="/recipes?filter=saved" className={styles.savedRecipesButton}>
               Visa sparade recept
             </Link>
+            <div className={styles.settingsBlock}>
+              <p className={styles.settingsLabel}>Inställningar</p>
+              <PushNotificationToggle />
+            </div>
           </>
         ) : friendship ? (
           <FriendButton

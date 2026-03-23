@@ -38,6 +38,41 @@ export function FriendsContent({
   const [sendingId, setSendingId] = useState<string | null>(null);
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    async function refreshFriends() {
+      try {
+        const res = await fetch("/api/friends");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (cancelled) return;
+        if (Array.isArray(data.friends)) setFriends(data.friends);
+        if (Array.isArray(data.incomingRequests)) setRequests(data.incomingRequests);
+      } catch {
+        // ignore background refresh errors
+      }
+    }
+
+    const interval = window.setInterval(refreshFriends, 30000);
+
+    function onFocusOrVisible() {
+      if (document.visibilityState === "visible") {
+        void refreshFriends();
+      }
+    }
+
+    window.addEventListener("focus", onFocusOrVisible);
+    document.addEventListener("visibilitychange", onFocusOrVisible);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+      window.removeEventListener("focus", onFocusOrVisible);
+      document.removeEventListener("visibilitychange", onFocusOrVisible);
+    };
+  }, []);
+
   const friendIdsKey = friends
     .map((f) => f.id)
     .slice()

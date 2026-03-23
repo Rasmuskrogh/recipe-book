@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/db/prisma";
 import { getFriendsData } from "@/lib/friends";
+import { sendPushNotification } from "@/lib/push/sendPushNotification";
 
 export async function GET() {
   const session = await auth();
@@ -69,6 +70,19 @@ export async function POST(request: NextRequest) {
   await prisma.friendRequest.create({
     data: { senderId: userId, receiverId, status: "PENDING" },
   });
+
+  const sender = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { name: true, username: true },
+  });
+  const senderName = sender?.name || sender?.username || "Någon";
+
+  await sendPushNotification(
+    receiverId,
+    "Ny vänförfrågan",
+    `Du har en ny vänförfrågan från ${senderName}`
+  );
+
   return NextResponse.json({ ok: true }, { status: 201 });
 }
 
@@ -123,6 +137,14 @@ export async function PATCH(request: NextRequest) {
       data: { userAId, userBId },
     }),
   ]);
+
+  const accepterName = session.user.name || session.user.username || "Någon";
+  await sendPushNotification(
+    friendRequest.senderId,
+    "Vänförfrågan accepterad",
+    `${accepterName} accepterade din vänförfrågan`
+  );
+
   return NextResponse.json({ ok: true });
 }
 

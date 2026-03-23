@@ -1,0 +1,20 @@
+.button {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+  background: transparent;
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.12));
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.button:hover {
+  background: var(--surface, rgba(0, 0, 0, 0.03));
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
