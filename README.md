@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Platemate
 
-## Getting Started
+A recipe site with a social layer: create and share recipes, friends, groups, direct messages, and realtime updates. The web app is built as a PWA (manifest, service worker, offline support).
 
-First, run the development server:
+## Tech stack
+
+| Area | Choice |
+|------|--------|
+| Framework | [Next.js](https://nextjs.org) 16 (App Router) |
+| UI | React 19, CSS modules |
+| Database | PostgreSQL via [Prisma](https://www.prisma.io) |
+| Auth | [NextAuth.js](https://next-auth.js.org) v5 (credentials + Prisma adapter) |
+| Realtime | [Pusher](https://pusher.com) |
+| Uploads | [Uploadthing](https://uploadthing.com) |
+| Push | [web-push](https://github.com/web-push-libs/web-push) (VAPID) |
+| Other | TipTap (editing), react-hook-form, Zod |
+
+The package name in `package.json` is `recepie-book`; the product name in the UI and manifest is **platemate**.
+
+## Requirements
+
+- Node.js 20+
+- PostgreSQL (e.g. Supabase or local Postgres)
+- Accounts/keys for Pusher, Uploadthing, and (if you use push) VAPID keys
+
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Copy environment variables into a `.env` file (see below) and set your database URL.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npx prisma migrate dev
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Open [http://localhost:3000](http://localhost:3000).
 
-## Learn More
+After `npm install`, `prisma generate` runs automatically via `postinstall`, so Prisma Client always matches the schema during builds (e.g. in CI).
 
-To learn more about Next.js, take a look at the following resources:
+## Environment variables
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+You typically need the following for a full local setup (match names to your existing `.env`):
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Variable | Purpose |
+|----------|---------|
+| `DATABASE_URL` | Postgres connection (Prisma) |
+| `DIRECT_URL` | Direct connection when using a pooler (e.g. Supabase) |
+| `AUTH_SECRET` | Secret for JWT/session (used in middleware) |
+| `PUSHER_APP_ID`, `PUSHER_KEY`, `PUSHER_SECRET`, `PUSHER_CLUSTER` | Server (Pusher) |
+| `NEXT_PUBLIC_PUSHER_KEY`, `NEXT_PUBLIC_PUSHER_CLUSTER` | Client (Pusher) |
+| `VAPID_SUBJECT`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | Web Push (server) |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | Same public VAPID key for the client (subscribe) |
 
-## Deploy on Vercel
+Uploadthing requires its own keys per [Uploadthing’s docs](https://docs.uploadthing.com) (add them to `.env` as their CLI/dashboard specifies).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Scripts
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Development server |
+| `npm run build` | Production build |
+| `npm run start` | Run production after build |
+| `npm run lint` | ESLint |
+
+Database changes: `npx prisma migrate dev` (or `prisma db push` for simple cases).
+
+## Features (overview)
+
+- **Recipes** – create, view, categories, saved recipes, visibility
+- **Profiles** – user profiles, editing, recipes on profile
+- **Friends** – friend requests and friend list
+- **Messages** – conversations with realtime Pusher updates
+- **Groups** – groups and group conversations
+- **PWA** – `public/sw.js`, manifest, icons
+- **Push** – subscriptions stored in `PushSubscription`; notifications can fire on friend requests, messages, and when someone saves your recipe
+
+## Deploy
+
+You can host the app on any Node host (e.g. [Vercel](https://vercel.com)). Set the same environment variables there, run migrations against the production database, and ensure `AUTH_SECRET` and database URLs are correct for HTTPS in production.
+
+## License
+
+Private project (`"private": true` in `package.json`).
