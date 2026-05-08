@@ -102,6 +102,20 @@
   opacity: 0.9;
 }
 
+.editRecipeLink {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.875rem;
+  border: 1px solid var(--foreground);
+  border-radius: 0.25rem;
+}
+
+.editRecipeLink:hover {
+  background: var(--foreground);
+  color: var(--background);
+}
+
 .recipeViewConverter {
   margin-top: 0.5rem;
 }

@@ -13,7 +13,15 @@ const ingredientSchema = z.object({
 
 const stepSchema = z.object({
   instruction: z.string().min(1, "Instruktion krävs"),
-  duration: z.number().int().min(0).optional(),
+  duration: z.preprocess(
+    (value) =>
+      value === "" ||
+      value == null ||
+      (typeof value === "number" && Number.isNaN(value))
+        ? undefined
+        : value,
+    z.number().int().min(0).optional()
+  ),
 });
 
 const categoryEnum = z.enum(["frukost", "lunch", "middag", "dessert", "bakning", "snacks", "dryck", "ovrigt"]);
@@ -23,11 +31,33 @@ const visibilityEnum = z.enum(["public", "friends", "private"]);
 const createRecipeSchema = z.object({
   title: z.string().min(1, "Titel krävs"),
   description: z.string().optional(),
-  category: categoryEnum.optional().nullable(),
-  difficulty: z.enum(["easy", "medium", "hard"]).optional(),
+  category: z.preprocess(
+    (value) => (value === "" ? null : value),
+    categoryEnum.optional().nullable()
+  ),
+  difficulty: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z.enum(["easy", "medium", "hard"]).optional()
+  ),
   servings: z.number().int().min(1, "Minst 1 portion"),
-  prepTime: z.number().int().min(0).optional(),
-  cookTime: z.number().int().min(0).optional(),
+  prepTime: z.preprocess(
+    (value) =>
+      value === "" ||
+      value == null ||
+      (typeof value === "number" && Number.isNaN(value))
+        ? undefined
+        : value,
+    z.number().int().min(0).optional()
+  ),
+  cookTime: z.preprocess(
+    (value) =>
+      value === "" ||
+      value == null ||
+      (typeof value === "number" && Number.isNaN(value))
+        ? undefined
+        : value,
+    z.number().int().min(0).optional()
+  ),
   imageUrl: z.string().url().optional().nullable(),
   visibility: visibilityEnum.optional().default("public"),
   ingredients: z.array(ingredientSchema).min(1, "Minst en ingrediens"),

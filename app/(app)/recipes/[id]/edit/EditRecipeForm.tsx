@@ -10,7 +10,7 @@ import { UploadButton } from "@/lib/uploadthing-react";
 import { getUnitsForSystem } from "@/lib/units/converter";
 import type { UnitSystem } from "@/lib/units/types";
 import { StepEditor } from "@/components/recipe/StepEditor";
-import styles from "./page.module.css";
+import styles from "../../new/page.module.css";
 import { toast } from "react-hot-toast";
 
 const ingredientSchema = z.object({
@@ -71,7 +71,12 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
-export default function NewRecipePage() {
+interface EditRecipeFormProps {
+  recipeId: string;
+  initialValues: FormData;
+}
+
+export function EditRecipeForm({ recipeId, initialValues }: EditRecipeFormProps) {
   const router = useRouter();
   const [unitSystem, setUnitSystem] = useState<UnitSystem>("metric");
   const [error, setError] = useState<string | null>(null);
@@ -85,15 +90,7 @@ export default function NewRecipePage() {
     setValue,
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: "",
-      description: "",
-      category: undefined,
-      servings: 4,
-      visibility: "public",
-      ingredients: [{ name: "", amount: 1, unit: "g" }],
-      steps: [{ instruction: "" }],
-    },
+    defaultValues: initialValues,
   });
 
   const { fields: ingFields, append: appendIng, remove: removeIng } = useFieldArray({
@@ -106,13 +103,13 @@ export default function NewRecipePage() {
     name: "steps",
   });
 
-  const imageUrl = useWatch({ control, name: "imageUrl", defaultValue: "" });
+  const imageUrl = useWatch({ control, name: "imageUrl", defaultValue: initialValues.imageUrl ?? "" });
 
   async function onSubmit(data: FormData) {
     setError(null);
     try {
-      const res = await fetch("/api/recipes", {
-        method: "POST",
+      const res = await fetch(`/api/recipes/${recipeId}`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...data,
@@ -146,8 +143,8 @@ export default function NewRecipePage() {
         return;
       }
 
-      toast.success("Sparades!");
-      router.push(`/recipes/${json.id}`);
+      toast.success("Recept uppdaterat!");
+      router.push(`/recipes/${recipeId}`);
       router.refresh();
     } catch {
       setError("Något gick fel, försök igen");
@@ -157,7 +154,7 @@ export default function NewRecipePage() {
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.title}>Nytt recept</h1>
+      <h1 className={styles.title}>Redigera recept</h1>
       <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
         {error && <p className={styles.error}>{error}</p>}
 
@@ -281,7 +278,7 @@ export default function NewRecipePage() {
               onClientUploadComplete={(res) => {
                 if (res?.[0]?.url) setValue("imageUrl", res[0].url);
               }}
-              onUploadError={() => { }}
+              onUploadError={() => {}}
             />
             <input type="hidden" {...register("imageUrl")} />
           </div>
@@ -374,7 +371,7 @@ export default function NewRecipePage() {
         </section>
 
         <button type="submit" className={styles.submit} disabled={isSubmitting}>
-          {isSubmitting ? "Sparar…" : "Spara recept"}
+          {isSubmitting ? "Sparar…" : "Uppdatera recept"}
         </button>
       </form>
     </div>

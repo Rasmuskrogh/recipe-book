@@ -11,5 +11,10 @@
 }
 
 .wakeLockWrap {
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.unitConverterWrap {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
 }

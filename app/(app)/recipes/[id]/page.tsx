@@ -112,6 +112,11 @@ export default async function RecipePage({
               <span>{recipe.author.name || recipe.author.username}</span>
             </Link>
           </div>
+          {session?.user?.id === recipe.authorId && (
+            <Link href={`/recipes/${id}/edit`} className={styles.editRecipeLink}>
+              Redigera recept
+            </Link>
+          )}
           {session?.user && (
             <RecipeBookmarkButton recipeId={id} initialSaved={isSaved} />
           )}
